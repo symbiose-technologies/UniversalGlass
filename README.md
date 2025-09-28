@@ -22,6 +22,8 @@
 
 OS 26 introduces new SwiftUI glass APIs, but these only ship on the latest platforms. UniversalGlass **isn't** a pixel-perfect recreation; it offers compatibility layers and API conveniences so your code paths stay unified on older systems, then quietly defers to Apple’s implementation on platforms that ship it.
 
+![CleanShot 2025-09-28 at 00 52 41](https://github.com/user-attachments/assets/2bb99027-e86a-4c98-84d1-86b527336be8)
+
 ---
 
 ## Highlights
