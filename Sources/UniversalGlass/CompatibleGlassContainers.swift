@@ -312,12 +312,32 @@ private struct GlassEffectUnionPreview: View {
                             .compatibleGlassEffectTransition(.matchedGeometry)
                             .compatibleGlassEffectUnion(id: "star and moon", namespace: namespace)
                     }
+                    
                 }
 
                 Image(systemName: "sparkle")
                     .font(.title)
                     .frame(width: 80, height: 80)
                     .compatibleGlassEffect()
+                
+                if showMoon {
+                    Image(systemName: "moon")
+                        .font(.title)
+                        .frame(width: 80, height: 80)
+                        .compatibleGlassEffect()
+                        .compatibleGlassEffectTransition(.matchedGeometry)
+                        .compatibleGlassEffectUnion(id: "star2 and moon", namespace: namespace)
+                }
+                
+                if showMoon {
+                    Image(systemName: "moon")
+                        .font(.title)
+                        .frame(width: 80, height: 80)
+                        .compatibleGlassEffect()
+                        .compatibleGlassEffectTransition(.matchedGeometry)
+                        .compatibleGlassEffectUnion(id: "star2 and moon", namespace: namespace)
+                }
+                
             }
         }
         .padding()
