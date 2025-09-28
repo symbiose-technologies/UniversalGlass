@@ -1,2 +1,346 @@
-// The Swift Programming Language
-// https://docs.swift.org/swift-book
+import SwiftUI
+
+// MARK: - Backward Compatible Liquid Glass Effects
+
+public extension View {
+
+    /// Applies a glass effect with backward compatibility to Material on older iOS versions
+    /// - Parameter rendering: Controls whether glass or material rendering is enforced.
+    @ViewBuilder
+    func compatibleGlassEffect(rendering: CompatibleGlassRendering = .automatic) -> some View {
+        if #available(iOS 26.0, *) {
+            switch rendering {
+            case .forceMaterial:
+                self.background(.regularMaterial.shadow(.drop(color: .black.opacity(0.04), radius: 8)), in: .capsule)
+            case .automatic, .forceGlass:
+                self.glassEffect()
+            }
+        } else {
+            self.background(.regularMaterial.shadow(.drop(color: .black.opacity(0.04), radius: 8)), in: .capsule)
+        }
+    }
+
+    /// Applies a glass effect with custom shape and backward compatibility
+    /// - Parameter rendering: Controls whether glass or material rendering is enforced.
+    @ViewBuilder
+    func compatibleGlassEffect<S: Shape>(in shape: S, rendering: CompatibleGlassRendering = .automatic) -> some View {
+        if #available(iOS 26.0, *) {
+            switch rendering {
+            case .forceMaterial:
+                self
+                    .background(.regularMaterial.shadow(.drop(color: .black.opacity(0.04), radius: 8)), in: shape)
+            case .automatic, .forceGlass:
+                self.glassEffect(in: shape)
+            }
+        } else {
+            self
+                .background(.regularMaterial.shadow(.drop(color: .black.opacity(0.04), radius: 8)), in: shape)
+        }
+    }
+
+    /// Applies a glass effect with custom glass configuration and backward compatibility
+    /// - Parameter rendering: Controls whether glass or material rendering is enforced.
+    @ViewBuilder
+    func compatibleGlassEffect(_ glass: CompatibleGlass, rendering: CompatibleGlassRendering = .automatic) -> some View {
+        if #available(iOS 26.0, *) {
+            switch rendering {
+            case .forceMaterial:
+                self.background(glass.fallbackMaterial.shadow(.drop(color: .black.opacity(0.04), radius: 8)), in: .capsule)
+            case .automatic, .forceGlass:
+                if let actualGlass = glass.liquidGlass {
+                    self.glassEffect(actualGlass)
+                } else {
+                    self.glassEffect()
+                }
+            }
+        } else {
+            self.background(glass.fallbackMaterial.shadow(.drop(color: .black.opacity(0.04), radius: 8)), in: .capsule)
+        }
+    }
+
+    /// Applies a glass effect with custom glass configuration and shape with backward compatibility
+    /// - Parameter rendering: Controls whether glass or material rendering is enforced.
+    @ViewBuilder
+    func compatibleGlassEffect<S: Shape>(_ glass: CompatibleGlass, in shape: S, rendering: CompatibleGlassRendering = .automatic) -> some View {
+        if #available(iOS 26.0, *) {
+            switch rendering {
+            case .forceMaterial:
+                self
+                    .background(glass.fallbackMaterial.shadow(.drop(color: .black.opacity(0.04), radius: 8)), in: shape)
+            case .automatic, .forceGlass:
+                if let actualGlass = glass.liquidGlass {
+                    self.glassEffect(actualGlass, in: shape)
+                } else {
+                    self.glassEffect(in: shape)
+                }
+            }
+        } else {
+            self
+                .background(glass.fallbackMaterial.shadow(.drop(color: .black.opacity(0.04), radius: 8)), in: shape)
+        }
+    }
+}
+
+// MARK: - Compatible Glass Configuration
+
+/// A configuration type that provides liquid glass effects on iOS 26+ and material fallbacks on older versions
+public struct CompatibleGlass {
+    let fallbackMaterial: Material
+    private let _liquidGlass: Any?
+
+    @available(iOS 26.0, *)
+    public var liquidGlass: Glass? {
+        return _liquidGlass as? Glass
+    }
+
+    private init(fallbackMaterial: Material, liquidGlass: Any? = nil) {
+        self.fallbackMaterial = fallbackMaterial
+        self._liquidGlass = liquidGlass
+    }
+
+    /// Regular liquid glass effect with regular material fallback
+    nonisolated(unsafe) public static let regular: CompatibleGlass = {
+        if #available(iOS 26.0, *) {
+            return CompatibleGlass(fallbackMaterial: .regularMaterial, liquidGlass: Glass.regular)
+        } else {
+            return CompatibleGlass(fallbackMaterial: .regularMaterial)
+        }
+    }()
+
+    /// Thick liquid glass effect with thick material fallback
+    nonisolated(unsafe) public static let thick: CompatibleGlass = {
+        if #available(iOS 26.0, *) {
+            return CompatibleGlass(fallbackMaterial: .thickMaterial, liquidGlass: Glass.regular)
+        } else {
+            return CompatibleGlass(fallbackMaterial: .thickMaterial)
+        }
+    }()
+
+    /// Thin liquid glass effect with thin material fallback
+    nonisolated(unsafe) public static let thin: CompatibleGlass = {
+        if #available(iOS 26.0, *) {
+            return CompatibleGlass(fallbackMaterial: .thinMaterial, liquidGlass: Glass.regular)
+        } else {
+            return CompatibleGlass(fallbackMaterial: .thinMaterial)
+        }
+    }()
+
+    /// Ultra thin liquid glass effect with ultra thin material fallback
+    nonisolated(unsafe) public static let ultraThin: CompatibleGlass = {
+        if #available(iOS 26.0, *) {
+            return CompatibleGlass(fallbackMaterial: .ultraThinMaterial, liquidGlass: Glass.regular)
+        } else {
+            return CompatibleGlass(fallbackMaterial: .ultraThinMaterial)
+        }
+    }()
+
+    /// Clear liquid glass effect with ultra thin material fallback
+    nonisolated(unsafe) public static let clear: CompatibleGlass = {
+        if #available(iOS 26.0, *) {
+            return CompatibleGlass(fallbackMaterial: .ultraThinMaterial, liquidGlass: Glass.clear)
+        } else {
+            return CompatibleGlass(fallbackMaterial: .ultraThinMaterial)
+        }
+    }()
+
+    /// Creates a tinted liquid glass effect with the specified color
+    /// Falls back to regular material on older versions
+    public func tint(_ color: Color) -> CompatibleGlass {
+        if #available(iOS 26.0, *) {
+            if let existingGlass = liquidGlass {
+                let tintedGlass: Any = existingGlass.tint(color)
+                return CompatibleGlass(fallbackMaterial: fallbackMaterial, liquidGlass: tintedGlass)
+            } else {
+                let tintedGlass: Any = Glass.regular.tint(color)
+                return CompatibleGlass(fallbackMaterial: fallbackMaterial, liquidGlass: tintedGlass)
+            }
+        } else {
+            return CompatibleGlass(fallbackMaterial: fallbackMaterial)
+        }
+    }
+
+    /// Creates an interactive liquid glass effect
+    /// Falls back to the same material on older versions
+    public func interactive(_ isInteractive: Bool = true) -> CompatibleGlass {
+        if #available(iOS 26.0, *) {
+            if let existingGlass = liquidGlass {
+                let interactiveGlass: Any = existingGlass.interactive(isInteractive)
+                return CompatibleGlass(fallbackMaterial: fallbackMaterial, liquidGlass: interactiveGlass)
+            } else {
+                let interactiveGlass: Any = Glass.regular.interactive(isInteractive)
+                return CompatibleGlass(fallbackMaterial: fallbackMaterial, liquidGlass: interactiveGlass)
+            }
+        } else {
+            return CompatibleGlass(fallbackMaterial: fallbackMaterial)
+        }
+    }
+}
+
+// MARK: - Compatible Glass Rendering
+
+/// Determines how compatible glass APIs render across different iOS versions.
+public enum CompatibleGlassRendering {
+    /// Uses glass on supported versions and falls back automatically otherwise.
+    case automatic
+    /// Forces the use of glass on supported versions, falling back to material when unavailable.
+    @available(iOS 26.0, *)
+    case forceGlass
+    /// Forces the material fallback even on platforms that support glass.
+    case forceMaterial
+}
+
+// MARK: - Compatible Button Styles
+
+public extension View {
+    @ViewBuilder
+    func compatibleGlassButtonStyle(
+        isProminent: Bool = false,
+        rendering: CompatibleGlassRendering = .automatic
+    ) -> some View {
+        if #available(iOS 26.0, *) {
+            switch rendering {
+            case .forceMaterial:
+                self.buttonStyle(.bordered)
+            case .automatic, .forceGlass:
+                self.buttonStyle(.glass)
+            }
+        } else {
+            self.buttonStyle(.bordered)
+        }
+    }
+}
+
+public extension View {
+    @ViewBuilder
+    func compatibleGlassProminentButtonStyle(
+        isProminent: Bool = false,
+        rendering: CompatibleGlassRendering = .automatic
+    ) -> some View {
+        if #available(iOS 26.0, *) {
+            switch rendering {
+            case .forceMaterial:
+                self.buttonStyle(.borderedProminent)
+            case .automatic, .forceGlass:
+                self.buttonStyle(.glassProminent)
+            }
+        } else {
+            self.buttonStyle(.borderedProminent)
+        }
+    }
+}
+// MARK: - Glass Effect Container
+
+/// A container that optimizes rendering performance for multiple liquid glass effects
+@MainActor @ViewBuilder
+public func CompatibleGlassEffectContainer<Content: View>(
+    spacing: CGFloat,
+    rendering: CompatibleGlassRendering = .automatic,
+    @ViewBuilder content: @escaping () -> Content
+) -> some View {
+    if #available(iOS 26.0, *) {
+        switch rendering {
+        case .forceMaterial:
+            content()
+        case .automatic, .forceGlass:
+            GlassEffectContainer(spacing: spacing, content: content)
+        }
+    } else {
+        content()
+    }
+}
+
+// MARK: - Glass Effect Modifiers
+
+public extension View {
+
+    /// Applies a glass effect union for morphing transitions with backward compatibility
+    @ViewBuilder
+    func compatibleGlassEffectUnion<ID: Hashable & Sendable>(
+        id: ID,
+        namespace: Namespace.ID,
+        rendering: CompatibleGlassRendering = .automatic
+    ) -> some View {
+        if #available(iOS 26.0, *) {
+            switch rendering {
+            case .forceMaterial:
+                self
+            case .automatic, .forceGlass:
+                self.glassEffectUnion(id: id, namespace: namespace)
+            }
+        } else {
+            self
+        }
+    }
+
+    /// Applies a glass effect ID for morphing transitions with backward compatibility
+    @ViewBuilder
+    func compatibleGlassEffectID<ID: Hashable & Sendable>(
+        _ id: ID,
+        in namespace: Namespace.ID,
+        rendering: CompatibleGlassRendering = .automatic
+    ) -> some View {
+        if #available(iOS 26.0, *) {
+            switch rendering {
+            case .forceMaterial:
+                self
+            case .automatic, .forceGlass:
+                self.glassEffectID(id, in: namespace)
+            }
+        } else {
+            self
+        }
+    }
+
+    /// Sets scroll extension mode with backward compatibility
+    @ViewBuilder
+    func compatibleScrollExtensionMode(_ mode: CompatibleScrollExtensionMode) -> some View {
+        if #available(iOS 26.0, *) {
+            switch mode {
+            case .underSidebar:
+                // Note: This API may not exist yet, commenting out for now
+                self // self.scrollExtensionMode(.underSidebar)
+            case .none:
+                self
+            }
+        } else {
+            self
+        }
+    }
+
+    /// Applies a glass effect transition with backward compatibility
+    @ViewBuilder
+    func compatibleGlassEffectTransition(
+        _ transition: CompatibleGlassEffectTransition,
+        rendering: CompatibleGlassRendering = .automatic
+    ) -> some View {
+        if #available(iOS 26.0, *) {
+            switch rendering {
+            case .forceMaterial:
+                self
+            case .automatic, .forceGlass:
+                switch transition {
+                case .materialize:
+                    self.glassEffectTransition(.materialize)
+                case .none:
+                    self
+                }
+            }
+        } else {
+            self
+        }
+    }
+}
+
+// MARK: - Compatible Scroll Extension Mode
+
+public enum CompatibleScrollExtensionMode {
+    case underSidebar
+    case none
+}
+
+// MARK: - Compatible Glass Effect Transition
+
+public enum CompatibleGlassEffectTransition {
+    case materialize
+    case none
+}
