@@ -97,7 +97,7 @@ public extension View {
             case .materialize:
                 self.transition(.blur)
             case .matchedGeometry:
-                self // wip
+                self.transition(.blur) // wip, temp effect
             case .identity:
                 self
             }
@@ -116,6 +116,7 @@ public extension View {
                     .frame(width: 80, height: 80)
                     .compatibleGlassEffect()
                     .compatibleGlassEffectUnion(id: "star and moon", namespace: namespace)
+                    
                 
                 if showMoon{
                     Image(systemName: "moon")
@@ -123,6 +124,7 @@ public extension View {
                         .frame(width: 80, height: 80)
                         .compatibleGlassEffect()
                         .compatibleGlassEffectUnion(id: "star and moon", namespace: namespace)
+                        .compatibleGlassEffectTransition(.matchedGeometry)
                 }
             }
             
