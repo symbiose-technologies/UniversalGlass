@@ -219,6 +219,8 @@ private struct GlassEffectFallbackOverlay: View {
     let participants: [GlassEffectParticipant]
     let proxy: GeometryProxy
 
+    @State private var overlayVersion = 0
+
     var body: some View {
         let resolved = participants.enumerated().map { index, participant in
             participant.resolve(in: proxy, order: index)
@@ -236,9 +238,11 @@ private struct GlassEffectFallbackOverlay: View {
             ForEach(orderedKeys) { key in
                 if let members = grouped[key] {
                     GlassEffectUnionOverlay(members: members)
+                        .transition(.blur)
                 }
             }
         }
+        .animation(.easeInOut(duration: 0.25), value: orderedKeys.count)
         .allowsHitTesting(false)
     }
 }
