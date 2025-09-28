@@ -39,8 +39,9 @@ public extension View {
             .glassEffect()
 
         Text("Custom Shape")
-            .padding(24)
-            .glassEffect(in: RoundedRectangle(cornerRadius: 32, style: .continuous))
+            .padding(.horizontal, 36)
+            .padding(.vertical, 16)
+            .glassEffect(in: RoundedRectangle(cornerRadius: 10, style: .continuous))
 
         Text("Tinted Glass")
             .padding(.horizontal, 36)
