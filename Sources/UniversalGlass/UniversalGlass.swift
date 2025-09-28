@@ -8,7 +8,7 @@ public extension View {
     /// - Parameter rendering: Controls whether glass or material rendering is enforced.
     @ViewBuilder
     func compatibleGlassEffect(rendering: CompatibleGlassRendering = .automatic) -> some View {
-        if #available(iOS 26.0, *) {
+        if #available(iOS 26.0, macOS 26.0, *) {
             switch rendering {
             case .forceMaterial:
                 self.background(.regularMaterial.shadow(.drop(color: .black.opacity(0.04), radius: 8)), in: .capsule)
@@ -24,7 +24,7 @@ public extension View {
     /// - Parameter rendering: Controls whether glass or material rendering is enforced.
     @ViewBuilder
     func compatibleGlassEffect<S: Shape>(in shape: S, rendering: CompatibleGlassRendering = .automatic) -> some View {
-        if #available(iOS 26.0, *) {
+        if #available(iOS 26.0, macOS 26.0, *) {
             switch rendering {
             case .forceMaterial:
                 self
@@ -42,7 +42,7 @@ public extension View {
     /// - Parameter rendering: Controls whether glass or material rendering is enforced.
     @ViewBuilder
     func compatibleGlassEffect(_ glass: CompatibleGlass, rendering: CompatibleGlassRendering = .automatic) -> some View {
-        if #available(iOS 26.0, *) {
+        if #available(iOS 26.0, macOS 26.0, *) {
             switch rendering {
             case .forceMaterial:
                 self.background(glass.fallbackMaterial.shadow(.drop(color: .black.opacity(0.04), radius: 8)), in: .capsule)
@@ -62,7 +62,7 @@ public extension View {
     /// - Parameter rendering: Controls whether glass or material rendering is enforced.
     @ViewBuilder
     func compatibleGlassEffect<S: Shape>(_ glass: CompatibleGlass, in shape: S, rendering: CompatibleGlassRendering = .automatic) -> some View {
-        if #available(iOS 26.0, *) {
+        if #available(iOS 26.0, macOS 26.0, *) {
             switch rendering {
             case .forceMaterial:
                 self
@@ -88,7 +88,7 @@ public struct CompatibleGlass {
     let fallbackMaterial: Material
     private let _liquidGlass: Any?
 
-    @available(iOS 26.0, *)
+    @available(iOS 26.0, macOS 26.0, *)
     public var liquidGlass: Glass? {
         return _liquidGlass as? Glass
     }
@@ -100,7 +100,7 @@ public struct CompatibleGlass {
 
     /// Regular liquid glass effect with regular material fallback
     nonisolated(unsafe) public static let regular: CompatibleGlass = {
-        if #available(iOS 26.0, *) {
+        if #available(iOS 26.0, macOS 26.0, *) {
             return CompatibleGlass(fallbackMaterial: .regularMaterial, liquidGlass: Glass.regular)
         } else {
             return CompatibleGlass(fallbackMaterial: .regularMaterial)
@@ -109,7 +109,7 @@ public struct CompatibleGlass {
 
     /// Thick liquid glass effect with thick material fallback
     nonisolated(unsafe) public static let thick: CompatibleGlass = {
-        if #available(iOS 26.0, *) {
+        if #available(iOS 26.0, macOS 26.0, *) {
             return CompatibleGlass(fallbackMaterial: .thickMaterial, liquidGlass: Glass.regular)
         } else {
             return CompatibleGlass(fallbackMaterial: .thickMaterial)
@@ -118,7 +118,7 @@ public struct CompatibleGlass {
 
     /// Thin liquid glass effect with thin material fallback
     nonisolated(unsafe) public static let thin: CompatibleGlass = {
-        if #available(iOS 26.0, *) {
+        if #available(iOS 26.0, macOS 26.0, *) {
             return CompatibleGlass(fallbackMaterial: .thinMaterial, liquidGlass: Glass.regular)
         } else {
             return CompatibleGlass(fallbackMaterial: .thinMaterial)
@@ -127,7 +127,7 @@ public struct CompatibleGlass {
 
     /// Ultra thin liquid glass effect with ultra thin material fallback
     nonisolated(unsafe) public static let ultraThin: CompatibleGlass = {
-        if #available(iOS 26.0, *) {
+        if #available(iOS 26.0, macOS 26.0, *) {
             return CompatibleGlass(fallbackMaterial: .ultraThinMaterial, liquidGlass: Glass.regular)
         } else {
             return CompatibleGlass(fallbackMaterial: .ultraThinMaterial)
@@ -136,7 +136,7 @@ public struct CompatibleGlass {
 
     /// Clear liquid glass effect with ultra thin material fallback
     nonisolated(unsafe) public static let clear: CompatibleGlass = {
-        if #available(iOS 26.0, *) {
+        if #available(iOS 26.0, macOS 26.0, *) {
             return CompatibleGlass(fallbackMaterial: .ultraThinMaterial, liquidGlass: Glass.clear)
         } else {
             return CompatibleGlass(fallbackMaterial: .ultraThinMaterial)
@@ -146,7 +146,7 @@ public struct CompatibleGlass {
     /// Creates a tinted liquid glass effect with the specified color
     /// Falls back to regular material on older versions
     public func tint(_ color: Color) -> CompatibleGlass {
-        if #available(iOS 26.0, *) {
+        if #available(iOS 26.0, macOS 26.0, *) {
             if let existingGlass = liquidGlass {
                 let tintedGlass: Any = existingGlass.tint(color)
                 return CompatibleGlass(fallbackMaterial: fallbackMaterial, liquidGlass: tintedGlass)
@@ -162,7 +162,7 @@ public struct CompatibleGlass {
     /// Creates an interactive liquid glass effect
     /// Falls back to the same material on older versions
     public func interactive(_ isInteractive: Bool = true) -> CompatibleGlass {
-        if #available(iOS 26.0, *) {
+        if #available(iOS 26.0, macOS 26.0, *) {
             if let existingGlass = liquidGlass {
                 let interactiveGlass: Any = existingGlass.interactive(isInteractive)
                 return CompatibleGlass(fallbackMaterial: fallbackMaterial, liquidGlass: interactiveGlass)
@@ -183,7 +183,7 @@ public enum CompatibleGlassRendering {
     /// Uses glass on supported versions and falls back automatically otherwise.
     case automatic
     /// Forces the use of glass on supported versions, falling back to material when unavailable.
-    @available(iOS 26.0, *)
+    @available(iOS 26.0, macOS 26.0, *)
     case forceGlass
     /// Forces the material fallback even on platforms that support glass.
     case forceMaterial
@@ -197,7 +197,7 @@ public extension View {
         isProminent: Bool = false,
         rendering: CompatibleGlassRendering = .automatic
     ) -> some View {
-        if #available(iOS 26.0, *) {
+        if #available(iOS 26.0, macOS 26.0, *) {
             switch rendering {
             case .forceMaterial:
                 self.buttonStyle(.bordered)
@@ -216,7 +216,7 @@ public extension View {
         isProminent: Bool = false,
         rendering: CompatibleGlassRendering = .automatic
     ) -> some View {
-        if #available(iOS 26.0, *) {
+        if #available(iOS 26.0, macOS 26.0, *) {
             switch rendering {
             case .forceMaterial:
                 self.buttonStyle(.borderedProminent)
@@ -237,7 +237,7 @@ public func CompatibleGlassEffectContainer<Content: View>(
     rendering: CompatibleGlassRendering = .automatic,
     @ViewBuilder content: @escaping () -> Content
 ) -> some View {
-    if #available(iOS 26.0, *) {
+    if #available(iOS 26.0, macOS 26.0, *) {
         switch rendering {
         case .forceMaterial:
             content()
@@ -260,7 +260,7 @@ public extension View {
         namespace: Namespace.ID,
         rendering: CompatibleGlassRendering = .automatic
     ) -> some View {
-        if #available(iOS 26.0, *) {
+        if #available(iOS 26.0, macOS 26.0, *) {
             switch rendering {
             case .forceMaterial:
                 self
@@ -279,7 +279,7 @@ public extension View {
         in namespace: Namespace.ID,
         rendering: CompatibleGlassRendering = .automatic
     ) -> some View {
-        if #available(iOS 26.0, *) {
+        if #available(iOS 26.0, macOS 26.0, *) {
             switch rendering {
             case .forceMaterial:
                 self
@@ -294,7 +294,7 @@ public extension View {
     /// Sets scroll extension mode with backward compatibility
     @ViewBuilder
     func compatibleScrollExtensionMode(_ mode: CompatibleScrollExtensionMode) -> some View {
-        if #available(iOS 26.0, *) {
+        if #available(iOS 26.0, macOS 26.0, *) {
             switch mode {
             case .underSidebar:
                 // Note: This API may not exist yet, commenting out for now
@@ -313,7 +313,7 @@ public extension View {
         _ transition: CompatibleGlassEffectTransition,
         rendering: CompatibleGlassRendering = .automatic
     ) -> some View {
-        if #available(iOS 26.0, *) {
+        if #available(iOS 26.0, macOS 26.0, *) {
             switch rendering {
             case .forceMaterial:
                 self
