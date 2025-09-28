@@ -217,13 +217,8 @@ private struct CompatibleGlassLegacyMaterialBody: View {
             }
 
             Capsule()
-                .strokeBorder(borderGradient, lineWidth: borderWidth)
-                .blendMode(.plusLighter)
+                .strokeBorder(Color.white.opacity(0.4), lineWidth: borderWidth)
                 .opacity(borderOpacity)
-
-            Capsule()
-                .fill(highlightGradient)
-                .opacity(configuration.isPressed ? pressedHighlightOpacity : baseHighlightOpacity)
         }
     }
 
@@ -257,49 +252,8 @@ private struct CompatibleGlassLegacyMaterialBody: View {
         return base * (isEnabled ? 1 : 0.45)
     }
 
-    private var borderGradient: LinearGradient {
-        let top = Color.white.opacity(colorScheme == .dark ? 0.55 : 0.75)
-        let bottom = Color.white.opacity(colorScheme == .dark ? 0.75 : 0.55)
-        return LinearGradient(
-            colors: [top, bottom],
-            startPoint: .top,
-            endPoint: .bottom
-        )
-    }
-
-    private var highlightGradient: LinearGradient {
-        switch variant {
-        case .standard:
-            let start = Color.white.opacity(colorScheme == .dark ? 0.28 : 0.45)
-            let end = Color.white.opacity(colorScheme == .dark ? 0.05 : 0.12)
-            return LinearGradient(
-                colors: [start, end],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
-        case .prominent:
-            let top = Color.white.opacity(colorScheme == .dark ? 0.35 : 0.5)
-            let bottom = Color.white.opacity(colorScheme == .dark ? 0.1 : 0.25)
-            return LinearGradient(
-                colors: [top, bottom],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
-        }
-    }
-
-    private var baseHighlightOpacity: CGFloat {
-        let base: CGFloat = variant == .prominent ? 0.3 : 0.18
-        return base * (isEnabled ? 1 : 0.55)
-    }
-
-    private var pressedHighlightOpacity: CGFloat {
-        let base: CGFloat = variant == .prominent ? 0.35 : 0.26
-        return base * (isEnabled ? 1 : 0.55)
-    }
-
     private var shadowColor: Color {
-        let base: Double = variant == .prominent ? 0.22 : 0.18
+        let base: Double = variant == .prominent ? 0.1 : 0.12
         return Color.black.opacity(isEnabled ? base : base * 0.35)
     }
 
@@ -402,7 +356,7 @@ public extension View {
     Button("Glass Button") {
         print("Glass Button Pressed")
     }
-    .tint(.purple)
+    .tint(.blue)
         .font(.headline)
         .padding(.horizontal, 24)
         .padding(.vertical, 12)
