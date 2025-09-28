@@ -29,3 +29,34 @@ public extension View {
         compatibleGlassEffect(glass, in: shape)
     }
 }
+
+#if DEBUG
+#Preview("Backport Glass Effect") {
+    VStack(spacing: 32) {
+        Text("Standard Glass")
+            .padding(.horizontal, 36)
+            .padding(.vertical, 16)
+            .glassEffect()
+
+        Text("Custom Shape")
+            .padding(24)
+            .glassEffect(in: RoundedRectangle(cornerRadius: 32, style: .continuous))
+
+        Text("Tinted Glass")
+            .padding(.horizontal, 36)
+            .padding(.vertical, 16)
+            .glassEffect(.regular.tint(.teal))
+    }
+    .font(.headline)
+    .frame(maxWidth: .infinity, maxHeight: .infinity)
+    .background(
+        LinearGradient(
+            colors: [Color(red: 0.05, green: 0.18, blue: 0.32),
+                     Color(red: 0.05, green: 0.38, blue: 0.48)],
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        )
+        .ignoresSafeArea()
+    )
+}
+#endif

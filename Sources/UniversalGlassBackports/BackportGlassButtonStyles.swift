@@ -38,6 +38,7 @@ public extension PrimitiveButtonStyle where Self == CompatibleGlassProminentButt
             .buttonStyle(.glassProminent)
     }
     .padding(32)
+    .frame(maxWidth: .infinity, maxHeight: .infinity)
     .background(Color.black.opacity(0.2).ignoresSafeArea())
 }
 #endif
