@@ -289,34 +289,6 @@ public extension PrimitiveButtonStyle where Self == CompatibleGlassProminentButt
     }
 }
 
-// MARK: - Back-Deployed Aliases
-
-// Availability ladders scope these shims to the window where the native `.glass` style is absent.
-
-@available(iOS, introduced: 13.0, obsoleted: 26.0)
-@available(macOS, introduced: 11.0, obsoleted: 26.0)
-@available(macCatalyst, introduced: 13.0, obsoleted: 26.0)
-@available(tvOS, introduced: 18.0, obsoleted: 26.0)
-@available(watchOS, introduced: 11.0, obsoleted: 26.0)
-public extension PrimitiveButtonStyle where Self == CompatibleGlassButtonStyle {
-    static var glass: CompatibleGlassButtonStyle {
-        // Within the back-deployment window, calling `.glass` returns our compatibility wrapper.
-        CompatibleGlassButtonStyle()
-    }
-}
-
-@available(iOS, introduced: 13.0, obsoleted: 26.0)
-@available(macOS, introduced: 11.0, obsoleted: 26.0)
-@available(macCatalyst, introduced: 13.0, obsoleted: 26.0)
-@available(tvOS, introduced: 18.0, obsoleted: 26.0)
-@available(watchOS, introduced: 11.0, obsoleted: 26.0)
-public extension PrimitiveButtonStyle where Self == CompatibleGlassProminentButtonStyle {
-    static var glassProminent: CompatibleGlassProminentButtonStyle {
-        // Same idea for prominent: older platforms map the alias to our custom primitive style.
-        CompatibleGlassProminentButtonStyle()
-    }
-}
-
 // MARK: - Backwards Compatible Modifiers
 
 public extension View {
@@ -325,14 +297,9 @@ public extension View {
         isProminent _: Bool = false,
         rendering: CompatibleGlassRendering = .automatic
     ) -> some View {
-        switch rendering {
-        case .automatic:
-            self.buttonStyle(.glass)
-        case .forceGlass, .forceMaterial:
-            self.buttonStyle(
-                .compatibleGlass(rendering: rendering)
-            )
-        }
+        self.buttonStyle(
+            .compatibleGlass(rendering: rendering)
+        )
     }
 
     @ViewBuilder
@@ -340,20 +307,15 @@ public extension View {
         isProminent _: Bool = true,
         rendering: CompatibleGlassRendering = .automatic
     ) -> some View {
-        switch rendering {
-        case .automatic:
-            self.buttonStyle(.glassProminent)
-        case .forceGlass, .forceMaterial:
-            self.buttonStyle(
-                .compatibleGlassProminent(rendering: rendering)
-            )
-        }
+        self.buttonStyle(
+            .compatibleGlassProminent(rendering: rendering)
+        )
     }
 }
 
 #if DEBUG
 #Preview("ButtonStyle: .glass") {
-    var sizes: [ControlSize] = [.mini, .small, .regular, .large, .extraLarge]
+    let sizes: [ControlSize] = [.mini, .small, .regular, .large, .extraLarge]
     
     ScrollView{
         ForEach(sizes, id: \.self){ size in
@@ -363,7 +325,9 @@ public extension View {
                 }
                 .tint(.blue)
                 .font(.headline)
-                .buttonStyle(.glass)
+                .buttonStyle(
+                    .compatibleGlass()
+                )
                 
                 Button("Glass Button") {
                     print("Glass Button Pressed")
@@ -380,7 +344,7 @@ public extension View {
 }
 
 #Preview("ButtonStyle: .glassProminent") {
-    var sizes: [ControlSize] = [.mini, .small, .regular, .large, .extraLarge]
+    let sizes: [ControlSize] = [.mini, .small, .regular, .large, .extraLarge]
     
     ScrollView{
         ForEach(sizes, id: \.self){ size in
@@ -390,7 +354,9 @@ public extension View {
                 }
                 .tint(.purple)
                 .font(.headline)
-                .buttonStyle(.glassProminent)
+                .buttonStyle(
+                    .compatibleGlassProminent()
+                )
                 
                 Button("Prominent Glass Button") {
                     print("Prominent Glass Button Pressed")

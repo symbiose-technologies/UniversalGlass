@@ -17,6 +17,10 @@ let package = Package(
             name: "UniversalGlass",
             targets: ["UniversalGlass"]
         ),
+        .library(
+            name: "UniversalGlassBackports",
+            targets: ["UniversalGlassBackports"]
+        )
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
@@ -24,6 +28,9 @@ let package = Package(
         .target(
             name: "UniversalGlass"
         ),
-
+        .target(
+            name: "UniversalGlassBackports",
+            dependencies: ["UniversalGlass"]
+        )
     ]
 )

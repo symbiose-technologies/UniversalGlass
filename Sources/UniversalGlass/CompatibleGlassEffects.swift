@@ -111,60 +111,6 @@ public extension View {
     }
 }
 
-private extension View {
-    @ViewBuilder
-    func legacyGlassEffect(glass: CompatibleGlass?, shape: AnyShape?) -> some View {
-        let fallbackMaterial = glass?.fallbackMaterial ?? .regularMaterial
-        let resolvedShape = shape ?? AnyShape(Capsule())
-
-        self.background(
-            fallbackMaterial.shadow(.drop(color: .black.opacity(0.04), radius: 8)),
-            in: resolvedShape
-        )
-    }
-}
-
-private struct AnyShape: Shape {
-    private let builder: @Sendable (CGRect) -> Path
-
-    init<S: Shape>(_ shape: S) {
-        builder = { rect in
-            shape.path(in: rect)
-        }
-    }
-
-    func path(in rect: CGRect) -> Path {
-        builder(rect)
-    }
-}
-
-// MARK: - Back-Deployed `.glassEffect`
-
-// Mirrors SwiftUI's `.glassEffect` APIs on platforms that have not yet shipped glass by
-// delegating to the material-based compatibility fallback.
-@available(iOS, introduced: 13.0, obsoleted: 26.0)
-@available(macOS, introduced: 11.0, obsoleted: 26.0)
-@available(macCatalyst, introduced: 13.0, obsoleted: 26.0)
-@available(tvOS, introduced: 18.0, obsoleted: 26.0)
-@available(watchOS, introduced: 11.0, obsoleted: 26.0)
-public extension View {
-    func glassEffect() -> some View {
-        legacyGlassEffect(glass: nil, shape: nil)
-    }
-
-    func glassEffect<S: Shape>(in shape: S) -> some View {
-        legacyGlassEffect(glass: nil, shape: AnyShape(shape))
-    }
-
-    func glassEffect(_ glass: CompatibleGlass) -> some View {
-        legacyGlassEffect(glass: glass, shape: nil)
-    }
-
-    func glassEffect<S: Shape>(_ glass: CompatibleGlass, in shape: S) -> some View {
-        legacyGlassEffect(glass: glass, shape: AnyShape(shape))
-    }
-}
-
 // MARK: - Compatible Glass Configuration
 
 /// A configuration type that provides liquid glass effects on iOS 26+ and material fallbacks on older versions
