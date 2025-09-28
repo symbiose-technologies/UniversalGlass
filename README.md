@@ -109,7 +109,7 @@ Button("Join Beta") {
 )
 ```
 
-Legacy fallbacks apply a capsule material with tint-aware highlights, drop shadow, and press animation so even iOS 18 looks like it shipped with SwiftUI 6.
+Legacy fallbacks apply a capsule material with tint-aware highlights, drop shadow, and press animations
 
 ### Effect Containers & Morphing
 
@@ -129,9 +129,9 @@ CompatibleGlassEffectContainer(spacing: 24) {
 }
 ```
 
-When a runtime supports `GlassEffectContainer` or `glassEffectTransition`, UniversalGlass forwards automatically; otherwise it gracefully falls back to material and blur transitions.
+When a runtime supports `GlassEffectContainer` or `glassEffectTransition`, UniversalGlass forwards automatically; otherwise it falls back to material and blur transitions.
 
-### Sparkly Transitions
+### Transitions
 
 ```swift
 @State private var showSettings = false
@@ -148,11 +148,7 @@ VStack {
 .animation(.easeInOut(duration: 0.3), value: showSettings)
 ```
 
-`AnyTransition.blur` (and friends) combine blur, opacity and scaling so your fallback animations still feel premium.
-
 ### Opt-in Backports
-
-Prefer to write the native APIs today?
 
 ```swift
 import UniversalGlassBackports
@@ -164,7 +160,7 @@ CardView()
     .glassEffect(.regular.tint(.mint))
 ```
 
-When your deployment target reaches iOS 26/macOS 15, SwiftUI’s real implementations automatically replace these extensions.
+SwiftUI’s real implementations automatically replace these extensions when available.
 
 ---
 
