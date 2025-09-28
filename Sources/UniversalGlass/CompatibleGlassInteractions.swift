@@ -77,43 +77,34 @@ public extension View {
 }
 
 #Preview("Modifier: compatibleGlassEffectTransition") {
-    CompatibleGlassInteractionTransitionDemo()
-}
+    VStack(spacing: 20) {
+        Text("Materialize transition applied to incoming content.")
+            .font(.footnote)
+            .foregroundStyle(.secondary)
+            .frame(maxWidth: .infinity, alignment: .leading)
 
-private struct CompatibleGlassInteractionTransitionDemo: View {
-    @State private var showDetails = false
-
-    var body: some View {
-        VStack(spacing: 20) {
-            Text("Toggle the card to preview the materialize glass transition.")
-                .font(.footnote)
+        VStack(spacing: 12) {
+            Text("Now Playing")
+                .font(.headline)
+            Text("Liquid glass animates in with a materialize transition.")
+                .font(.caption)
                 .foregroundStyle(.secondary)
-                .frame(maxWidth: .infinity, alignment: .leading)
-
-            ZStack {
-                if showDetails {
-                    VStack(spacing: 12) {
-                        Text("Now Playing")
-                            .font(.headline)
-                        Text("Liquid glass animates in with a materialize transition.")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
-                    .padding(24)
-                    .compatibleGlassEffect(rendering: .automatic)
-                    .compatibleGlassEffectTransition(.materialize)
-                    .transition(.scale(scale: 0.9).combined(with: .opacity))
-                }
-            }
-            .frame(height: 160)
-
-            Button(showDetails ? "Hide Card" : "Show Card") {
-                withAnimation(.spring(duration: 0.45)) {
-                    showDetails.toggle()
-                }
-            }
-            .compatibleGlassProminentButtonStyle(rendering: .automatic)
         }
+        .padding(24)
+        .compatibleGlassEffect(rendering: .automatic)
+        .compatibleGlassEffectTransition(.materialize)
+
+        VStack(spacing: 12) {
+            Text("Static State")
+                .font(.headline)
+            Text("No transition modifier applied here.")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+        }
+        .padding(24)
+        .compatibleGlassEffect(rendering: .automatic)
+        .compatibleGlassEffectTransition(.none)
     }
+    .padding()
 }
 #endif
