@@ -93,7 +93,14 @@ public extension View {
                 self.glassEffectTransition(.identity)
             }
         } else {
-            self
+            switch transition {
+            case .materialize:
+                self.transition(.blur)
+            case .matchedGeometry:
+                self // wip
+            case .identity:
+                self
+            }
         }
     }
 }
