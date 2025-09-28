@@ -10,7 +10,7 @@ struct GlassEffectUnion: Hashable {
 struct GlassEffectParticipantContext {
     var union: GlassEffectUnion?
     var effectID: AnyHashable?
-    var transition: CompatibleGlassEffectTransition?
+    var transition: UniversalGlassEffectTransition?
 }
 
 private struct GlassEffectParticipantContextKey: EnvironmentKey {
@@ -29,7 +29,7 @@ private struct IsInGlassContainerKey: EnvironmentKey {
 }
 
 extension EnvironmentValues {
-    var isInCompatibleGlassContainer: Bool {
+    var isInFallbackGlassContainer: Bool {
         get { self[IsInGlassContainerKey.self] }
         set { self[IsInGlassContainerKey.self] = newValue }
     }
@@ -52,11 +52,11 @@ struct GlassEffectParticipant: Identifiable {
     let anchor: Anchor<CGRect>
     var union: GlassEffectUnion?
     var effectID: AnyHashable?
-    let transition: CompatibleGlassEffectTransition?
+    let transition: UniversalGlassEffectTransition?
     let shape: AnyGlassShape?
     let glass: CompatibleGlass?
     let fallbackMaterial: Material
-    let rendering: CompatibleGlassRendering
+    let rendering: UniversalGlassRendering
     let drawsOwnBackground: Bool
 }
 
@@ -78,17 +78,17 @@ public extension View {
     /// Applies a glass effect with backward compatibility to Material on older versions.
     /// - Parameter rendering: Controls whether glass or material rendering is enforced.
     @ViewBuilder
-    func compatibleGlassEffect(rendering: CompatibleGlassRendering = .automatic) -> some View {
+    func compatibleGlassEffect(rendering: UniversalGlassRendering = .automatic) -> some View {
         if #available(iOS 26.0, macOS 26.0, *) {
             switch rendering {
-            case .forceMaterial:
+            case .material:
                 applyingCompatibleGlassFallback(
                     fallbackMaterial: .regularMaterial,
                     glassConfiguration: nil,
                     shape: nil,
                     rendering: rendering
                 )
-            case .automatic, .forceGlass:
+            case .automatic, .glass:
                 self.glassEffect()
             }
         } else {
@@ -106,18 +106,18 @@ public extension View {
     @ViewBuilder
     func compatibleGlassEffect<S: Shape>(
         in shape: S,
-        rendering: CompatibleGlassRendering = .automatic
+        rendering: UniversalGlassRendering = .automatic
     ) -> some View {
         if #available(iOS 26.0, macOS 26.0, *) {
             switch rendering {
-            case .forceMaterial:
+            case .material:
                 applyingCompatibleGlassFallback(
                     fallbackMaterial: .regularMaterial,
                     glassConfiguration: nil,
                     shape: AnyGlassShape(shape),
                     rendering: rendering
                 )
-            case .automatic, .forceGlass:
+            case .automatic, .glass:
                 self.glassEffect(in: shape)
             }
         } else {
@@ -135,18 +135,18 @@ public extension View {
     @ViewBuilder
     func compatibleGlassEffect(
         _ glass: CompatibleGlass,
-        rendering: CompatibleGlassRendering = .automatic
+        rendering: UniversalGlassRendering = .automatic
     ) -> some View {
         if #available(iOS 26.0, macOS 26.0, *) {
             switch rendering {
-            case .forceMaterial:
+            case .material:
                 applyingCompatibleGlassFallback(
                     fallbackMaterial: glass.fallbackMaterial,
                     glassConfiguration: glass,
                     shape: nil,
                     rendering: rendering
                 )
-            case .automatic, .forceGlass:
+            case .automatic, .glass:
                 if let actualGlass = glass.liquidGlass {
                     self.glassEffect(actualGlass)
                 } else {
@@ -168,18 +168,18 @@ public extension View {
     func compatibleGlassEffect<S: Shape>(
         _ glass: CompatibleGlass,
         in shape: S,
-        rendering: CompatibleGlassRendering = .automatic
+        rendering: UniversalGlassRendering = .automatic
     ) -> some View {
         if #available(iOS 26.0, macOS 26.0, *) {
             switch rendering {
-            case .forceMaterial:
+            case .material:
                 applyingCompatibleGlassFallback(
                     fallbackMaterial: glass.fallbackMaterial,
                     glassConfiguration: glass,
                     shape: AnyGlassShape(shape),
                     rendering: rendering
                 )
-            case .automatic, .forceGlass:
+            case .automatic, .glass:
                 if let actualGlass = glass.liquidGlass {
                     self.glassEffect(actualGlass, in: shape)
                 } else {
@@ -202,7 +202,7 @@ private extension View {
         fallbackMaterial: Material,
         glassConfiguration: CompatibleGlass?,
         shape: AnyGlassShape?,
-        rendering: CompatibleGlassRendering
+        rendering: UniversalGlassRendering
     ) -> some View {
         modifier(
             CompatibleGlassEffectModifier(
@@ -217,12 +217,12 @@ private extension View {
 
 private struct CompatibleGlassEffectModifier: ViewModifier {
     @Environment(\.glassEffectParticipantContext) private var context
-    @Environment(\.isInCompatibleGlassContainer) private var isInContainer
+    @Environment(\.isInFallbackGlassContainer) private var isInContainer
 
     let fallbackMaterial: Material
     let glassConfiguration: CompatibleGlass?
     let shape: AnyGlassShape?
-    let rendering: CompatibleGlassRendering
+    let rendering: UniversalGlassRendering
 
     func body(content: Content) -> some View {
         let drawsBackground = !isInContainer

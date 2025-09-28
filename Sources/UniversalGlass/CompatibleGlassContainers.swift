@@ -4,24 +4,24 @@ import SwiftUI
 
 /// A container that optimizes rendering performance for multiple liquid glass effects
 @MainActor @ViewBuilder
-public func CompatibleGlassEffectContainer<Content: View>(
+public func UniversalGlassEffectContainer<Content: View>(
     spacing: CGFloat? = nil,
-    rendering: CompatibleGlassRendering = .automatic,
+    rendering: UniversalGlassRendering = .automatic,
     @ViewBuilder content: @escaping () -> Content
 ) -> some View {
     if #available(iOS 26.0, macOS 26.0, *) {
         switch rendering {
-        case .forceMaterial:
-            CompatibleGlassEffectContainerFallback(
+        case .material:
+            FallbackGlassEffectContainerRenderer(
                 spacing: spacing,
                 rendering: rendering,
                 content: content
             )
-        case .automatic, .forceGlass:
+        case .automatic, .glass:
             GlassEffectContainer(spacing: spacing, content: content)
         }
     } else {
-        CompatibleGlassEffectContainerFallback(
+        FallbackGlassEffectContainerRenderer(
             spacing: spacing,
             rendering: rendering,
             content: content
@@ -35,19 +35,19 @@ public extension View {
     
     /// Applies a glass effect union for morphing transitions with backward compatibility
     @ViewBuilder
-    func compatibleGlassEffectUnion<ID: Hashable & Sendable>(
+    func universalGlassEffectUnion<ID: Hashable & Sendable>(
         id: ID,
         namespace: Namespace.ID,
-        rendering: CompatibleGlassRendering = .automatic
+        rendering: UniversalGlassRendering = .automatic
     ) -> some View {
         if #available(iOS 26.0, macOS 26.0, *) {
             switch rendering {
-            case .forceMaterial:
+            case .material:
                 self
                     .transformEnvironment(\.glassEffectParticipantContext) { context in
                         context.union = GlassEffectUnion(id: AnyHashable(id), namespace: namespace)
                     }
-            case .automatic, .forceGlass:
+            case .automatic, .glass:
                 self.glassEffectUnion(id: id, namespace: namespace)
             }
         } else {
@@ -60,23 +60,23 @@ public extension View {
     
     /// Applies a glass effect ID for morphing transitions with backward compatibility
     @ViewBuilder
-    func compatibleGlassEffectID<ID: Hashable & Sendable>(
+    func universalGlassEffectID<ID: Hashable & Sendable>(
         _ id: ID,
         in namespace: Namespace.ID,
-        rendering: CompatibleGlassRendering = .automatic
+        rendering: UniversalGlassRendering = .automatic
     ) -> some View {
         if #available(iOS 26.0, macOS 26.0, *) {
             switch rendering {
-            case .forceMaterial:
+            case .material:
                 self
-            case .automatic, .forceGlass:
+            case .automatic, .glass:
                 self.glassEffectID(id, in: namespace)
             }
         } else {
             switch rendering {
-            case .forceMaterial:
+            case .material:
                 self
-            case .automatic, .forceGlass:
+            case .automatic, .glass:
                 self.transformEnvironment(\.glassEffectParticipantContext) { context in
                     context.effectID = AnyHashable(id)
                     context.union = GlassEffectUnion(id: AnyHashable(id), namespace: namespace)
@@ -88,7 +88,7 @@ public extension View {
 
 // MARK: - Compatible Glass Effect Transition
 
-public enum CompatibleGlassEffectTransition {
+public enum UniversalGlassEffectTransition {
     case materialize
     case matchedGeometry
     case identity
@@ -98,8 +98,8 @@ public extension View {
     
     /// Applies a glass effect transition with backward compatibility
     @ViewBuilder
-    func compatibleGlassEffectTransition(
-        _ transition: CompatibleGlassEffectTransition
+    func universalGlassEffectTransition(
+        _ transition: UniversalGlassEffectTransition
     ) -> some View {
         if #available(iOS 26.0, macOS 26.0, *) {
             switch transition {
@@ -129,28 +129,19 @@ public extension View {
 
 // MARK: - Fallback Container Rendering
 
-private struct CompatibleGlassEffectContainerFallback<Content: View>: View {
-    let spacing: CGFloat?
-    let rendering: CompatibleGlassRendering
-    let content: () -> Content
-
-    var body: some View {
-        GlassEffectContainerRenderer(rendering: rendering, content: content)
-    }
-}
-
-private struct GlassEffectContainerRenderer<Content: View>: View {
-    let rendering: CompatibleGlassRendering
+private struct FallbackGlassEffectContainerRenderer<Content: View>: View {
+    var spacing: CGFloat? = .zero
+    let rendering: UniversalGlassRendering
     let content: () -> Content
 
     var body: some View {
         ZStack(alignment: .topLeading) {
             content()
                 .environment(\.glassEffectParticipantContext, GlassEffectParticipantContext())
-                .environment(\.isInCompatibleGlassContainer, true)
+                .environment(\.isInFallbackGlassContainer, true)
         }
         .mask({
-            Color.red
+            Color.black
                 .overlayPreferenceValue(GlassEffectParticipantsKey.self) { participants in
                     GeometryReader { proxy in
                         GlassEffectFallbackOverlay(participants: participants, proxy: proxy)
@@ -171,11 +162,11 @@ private struct ResolvedGlassEffectParticipant: Identifiable {
     let frame: CGRect
     let union: GlassEffectUnion?
     let effectID: AnyHashable?
-    let transition: CompatibleGlassEffectTransition?
+    let transition: UniversalGlassEffectTransition?
     let shape: AnyGlassShape?
     let glass: CompatibleGlass?
     let fallbackMaterial: Material
-    let rendering: CompatibleGlassRendering
+    let rendering: UniversalGlassRendering
     let drawsOwnBackground: Bool
     let order: Int
 
@@ -271,25 +262,11 @@ private struct GlassEffectUnionOverlay: View {
         let material = anchor.glass?.fallbackMaterial ?? anchor.fallbackMaterial
 
         return AnyView(
-            CompatibleGlassOverlay(material: material, shape: shape)
+            Color.clear
+            .background(material.shadow(.drop(color: .black.opacity(0.04), radius: 8)), in: shape)
                 .frame(width: bounds.width, height: bounds.height)
                 .position(x: bounds.midX, y: bounds.midY)
         )
-    }
-}
-
-private struct CompatibleGlassOverlay: View {
-    let material: Material
-    let shape: AnyGlassShape
-
-    var body: some View {
-        if #available(iOS 15.0, macOS 13.0, *) {
-            Color.clear
-                .background(material.shadow(.drop(color: .black.opacity(0.04), radius: 8)), in: shape)
-        } else {
-            Color.clear
-                .background(material, in: shape)
-        }
     }
 }
 
@@ -311,7 +288,7 @@ private struct GlassEffectUnionPreview: View {
 
     var body: some View {
         HStack(spacing: 30){
-            CompatibleGlassEffectContainer() {
+            UniversalGlassEffectContainer() {
                 VStack(spacing: 20) {
                     VStack(spacing: 0) {
                         
@@ -320,14 +297,14 @@ private struct GlassEffectUnionPreview: View {
                                 .font(.title)
                                 .frame(width: 80, height: 80)
                                 .compatibleGlassEffect()
-                                .compatibleGlassEffectTransition(.matchedGeometry)
-                                .compatibleGlassEffectUnion(id: "star and moon", namespace: namespace)
+                                .universalGlassEffectTransition(.matchedGeometry)
+                                .universalGlassEffectUnion(id: "star and moon", namespace: namespace)
                         }
                         Image(systemName: "star")
                             .font(.title)
                             .frame(width: 80, height: 80)
                             .compatibleGlassEffect()
-                            .compatibleGlassEffectUnion(id: "star and moon", namespace: namespace)
+                            .universalGlassEffectUnion(id: "star and moon", namespace: namespace)
                         
                     }
 
@@ -341,8 +318,8 @@ private struct GlassEffectUnionPreview: View {
                             .font(.title)
                             .frame(width: 80, height: 80)
                             .compatibleGlassEffect()
-                            .compatibleGlassEffectTransition(.matchedGeometry)
-                            .compatibleGlassEffectUnion(id: "star2 and moon", namespace: namespace)
+                            .universalGlassEffectTransition(.matchedGeometry)
+                            .universalGlassEffectUnion(id: "star2 and moon", namespace: namespace)
                     }
                     
                     if showMoon {
@@ -350,15 +327,15 @@ private struct GlassEffectUnionPreview: View {
                             .font(.title)
                             .frame(width: 80, height: 80)
                             .compatibleGlassEffect()
-                            .compatibleGlassEffectTransition(.matchedGeometry)
-                            .compatibleGlassEffectUnion(id: "star2 and moon", namespace: namespace)
+                            .universalGlassEffectTransition(.matchedGeometry)
+                            .universalGlassEffectUnion(id: "star2 and moon", namespace: namespace)
                     }
                     
                 }
             }
             .frame(maxWidth: .infinity)
             
-            CompatibleGlassEffectContainer(rendering: .forceMaterial) {
+            UniversalGlassEffectContainer(rendering: .material) {
                 VStack(spacing: 20) {
                     VStack(spacing: 0) {
                         
@@ -367,15 +344,15 @@ private struct GlassEffectUnionPreview: View {
                         Image(systemName: "moon")
                             .font(.title)
                             .frame(width: 80, height: 80)
-                            .compatibleGlassEffect(rendering: .forceMaterial)
-                            .compatibleGlassEffectTransition(.matchedGeometry)
-                            .compatibleGlassEffectUnion(id: "star and moon", namespace: namespace, rendering: .forceMaterial)
+                            .compatibleGlassEffect(rendering: .material)
+                            .universalGlassEffectTransition(.matchedGeometry)
+                            .universalGlassEffectUnion(id: "star and moon", namespace: namespace, rendering: .material)
                     }
                         Image(systemName: "star")
                             .font(.title)
                             .frame(width: 80, height: 80)
-                            .compatibleGlassEffect(rendering: .forceMaterial)
-                            .compatibleGlassEffectUnion(id: "star and moon", namespace: namespace, rendering: .forceMaterial)
+                            .compatibleGlassEffect(rendering: .material)
+                            .universalGlassEffectUnion(id: "star and moon", namespace: namespace, rendering: .material)
                         
                     }
 
@@ -388,18 +365,18 @@ private struct GlassEffectUnionPreview: View {
                         Image(systemName: "cloud")
                             .font(.title)
                             .frame(width: 80, height: 80)
-                            .compatibleGlassEffect(rendering: .forceMaterial)
-                            .compatibleGlassEffectTransition(.matchedGeometry)
-                            .compatibleGlassEffectUnion(id: "star2 and moon", namespace: namespace, rendering: .forceMaterial)
+                            .compatibleGlassEffect(rendering: .material)
+                            .universalGlassEffectTransition(.matchedGeometry)
+                            .universalGlassEffectUnion(id: "star2 and moon", namespace: namespace, rendering: .material)
                     }
                     
                     if showMoon {
                         Image(systemName: "sunglasses")
                             .font(.title)
                             .frame(width: 80, height: 80)
-                            .compatibleGlassEffect(rendering: .forceMaterial)
-                            .compatibleGlassEffectTransition(.matchedGeometry)
-                            .compatibleGlassEffectUnion(id: "star2 and moon", namespace: namespace, rendering: .forceMaterial)
+                            .compatibleGlassEffect(rendering: .material)
+                            .universalGlassEffectTransition(.matchedGeometry)
+                            .universalGlassEffectUnion(id: "star2 and moon", namespace: namespace, rendering: .material)
                     }
                     
                 }
@@ -451,7 +428,7 @@ private struct GlassEffectTransitionPreview: View {
     @State private var showIdentity = true
 
     var body: some View {
-        CompatibleGlassEffectContainer() {
+        UniversalGlassEffectContainer() {
             VStack(spacing: 20) {
                 if showMaterialize {
                     VStack(spacing: 12) {
@@ -463,7 +440,7 @@ private struct GlassEffectTransitionPreview: View {
                     }
                     .padding(24)
                     .compatibleGlassEffect()
-                    .compatibleGlassEffectTransition(.materialize)
+                    .universalGlassEffectTransition(.materialize)
                 }
 
                 if showGeometry {
@@ -476,7 +453,7 @@ private struct GlassEffectTransitionPreview: View {
                     }
                     .padding(24)
                     .compatibleGlassEffect()
-                    .compatibleGlassEffectTransition(.matchedGeometry)
+                    .universalGlassEffectTransition(.matchedGeometry)
                 }
 
                 if showIdentity {
@@ -489,7 +466,7 @@ private struct GlassEffectTransitionPreview: View {
                     }
                     .padding(24)
                     .compatibleGlassEffect()
-                    .compatibleGlassEffectTransition(.identity)
+                    .universalGlassEffectTransition(.identity)
                 }
             }
         }
@@ -532,7 +509,7 @@ private struct GlassEffectTransitionPreview: View {
     }
 }
 
-#Preview("Modifier: compatibleGlassEffectTransition") {
+#Preview("Modifier: universalGlassEffectTransition") {
     GlassEffectTransitionPreview()
 }
 #endif

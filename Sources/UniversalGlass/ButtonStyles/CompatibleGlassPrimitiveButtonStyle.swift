@@ -5,10 +5,10 @@ import SwiftUI
 public struct CompatibleGlassButtonStyle: PrimitiveButtonStyle {
     public typealias Body = AnyView
 
-    private let rendering: CompatibleGlassRendering
+    private let rendering: UniversalGlassRendering
 
     public init(
-        rendering: CompatibleGlassRendering = .automatic
+        rendering: UniversalGlassRendering = .automatic
     ) {
         self.rendering = rendering
     }
@@ -54,10 +54,10 @@ public struct CompatibleGlassButtonStyle: PrimitiveButtonStyle {
 public struct CompatibleGlassProminentButtonStyle: PrimitiveButtonStyle {
     public typealias Body = AnyView
 
-    private let rendering: CompatibleGlassRendering
+    private let rendering: UniversalGlassRendering
 
     public init(
-        rendering: CompatibleGlassRendering = .automatic
+        rendering: UniversalGlassRendering = .automatic
     ) {
         self.rendering = rendering
     }
@@ -104,14 +104,14 @@ public struct CompatibleGlassProminentButtonStyle: PrimitiveButtonStyle {
 
 // `@inline(__always)` requests the compiler to substitute the function body at every call site.
 @inline(__always)
-private func resolveShouldUseGlass(for rendering: CompatibleGlassRendering) -> Bool {
+private func resolveShouldUseGlass(for rendering: UniversalGlassRendering) -> Bool {
     // Inline to keep the availability-heavy branching from adding extra view layers.
     if #available(iOS 26.0, macOS 26.0, *) {
-        if case .forceMaterial = rendering {
+        if case .material = rendering {
             return false
         }
 
-        if case .forceGlass = rendering {
+        if case .glass = rendering {
             return true
         }
 

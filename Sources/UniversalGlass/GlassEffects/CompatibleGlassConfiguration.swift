@@ -125,12 +125,12 @@ public struct CompatibleGlass {
 // MARK: - Compatible Glass Rendering
 
 /// Determines how compatible glass APIs render across different versions.
-public enum CompatibleGlassRendering {
+public enum UniversalGlassRendering {
     /// Uses glass on supported versions and falls back automatically otherwise.
     case automatic
     /// Forces the use of glass on supported versions, falling back to material when unavailable.
     @available(iOS 26.0, macOS 26.0, *)
-    case forceGlass
+    case glass
     /// Forces the material fallback even on platforms that support glass.
-    case forceMaterial
+    case material
 }

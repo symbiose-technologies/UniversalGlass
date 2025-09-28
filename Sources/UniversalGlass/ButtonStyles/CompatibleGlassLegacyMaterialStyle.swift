@@ -8,7 +8,7 @@ enum CompatibleGlassLegacyVariant {
 }
 
 struct CompatibleGlassLegacyMaterialStyle: ButtonStyle {
-    let rendering: CompatibleGlassRendering
+    let rendering: UniversalGlassRendering
     let variant: CompatibleGlassLegacyVariant
 
     func makeBody(configuration: Configuration) -> some View {
@@ -22,7 +22,7 @@ struct CompatibleGlassLegacyMaterialStyle: ButtonStyle {
 
 private struct CompatibleGlassLegacyMaterialBody: View {
     let configuration: ButtonStyle.Configuration
-    let rendering: CompatibleGlassRendering
+    let rendering: UniversalGlassRendering
     let variant: CompatibleGlassLegacyVariant
 
     @Environment(\.controlSize) private var controlSize
@@ -114,9 +114,9 @@ private struct CompatibleGlassLegacyMaterialBody: View {
         return glass.interactive()
     }
 
-    private var fallbackRendering: CompatibleGlassRendering {
-        if #available(iOS 26.0, macOS 26.0, *), case .forceMaterial = rendering {
-            return .forceMaterial
+    private var fallbackRendering: UniversalGlassRendering {
+        if #available(iOS 26.0, macOS 26.0, *), case .material = rendering {
+            return .material
         }
 
         return .automatic

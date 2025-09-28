@@ -4,7 +4,7 @@ import SwiftUI
 
 public extension PrimitiveButtonStyle where Self == CompatibleGlassButtonStyle {
     static func compatibleGlass(
-        rendering: CompatibleGlassRendering = .automatic
+        rendering: UniversalGlassRendering = .automatic
     ) -> CompatibleGlassButtonStyle {
         CompatibleGlassButtonStyle(rendering: rendering)
     }
@@ -12,7 +12,7 @@ public extension PrimitiveButtonStyle where Self == CompatibleGlassButtonStyle {
 
 public extension PrimitiveButtonStyle where Self == CompatibleGlassProminentButtonStyle {
     static func compatibleGlassProminent(
-        rendering: CompatibleGlassRendering = .automatic
+        rendering: UniversalGlassRendering = .automatic
     ) -> CompatibleGlassProminentButtonStyle {
         CompatibleGlassProminentButtonStyle(rendering: rendering)
     }
@@ -24,7 +24,7 @@ public extension View {
     @ViewBuilder
     func compatibleGlassButtonStyle(
         isProminent _: Bool = false,
-        rendering: CompatibleGlassRendering = .automatic
+        rendering: UniversalGlassRendering = .automatic
     ) -> some View {
         self.buttonStyle(
             .compatibleGlass(rendering: rendering)
@@ -34,7 +34,7 @@ public extension View {
     @ViewBuilder
     func compatibleGlassProminentButtonStyle(
         isProminent _: Bool = true,
-        rendering: CompatibleGlassRendering = .automatic
+        rendering: UniversalGlassRendering = .automatic
     ) -> some View {
         self.buttonStyle(
             .compatibleGlassProminent(rendering: rendering)
@@ -59,7 +59,7 @@ public extension View {
                 Button("Glass Button") {}
                     .tint(.blue)
                     .font(.headline)
-                    .buttonStyle(.compatibleGlass(rendering: .forceMaterial))
+                    .buttonStyle(.compatibleGlass(rendering: .material))
             }
             .padding(.vertical, 20)
             .controlSize(size)
@@ -84,7 +84,7 @@ public extension View {
                 Button("Prominent Glass Button") {}
                     .tint(.purple)
                     .font(.headline)
-                    .buttonStyle(.compatibleGlassProminent(rendering: .forceMaterial))
+                    .buttonStyle(.compatibleGlassProminent(rendering: .material))
             }
             .padding(.vertical, 20)
             .controlSize(size)
@@ -99,7 +99,7 @@ public extension View {
         .padding(.horizontal, 24)
         .padding(.vertical, 12)
         .buttonStyle(
-            .compatibleGlass(rendering: .forceMaterial)
+            .compatibleGlass(rendering: .material)
         )
 }
 
@@ -110,7 +110,7 @@ public extension View {
         .padding(.vertical, 12)
         .tint(.pink)
         .buttonStyle(
-            .compatibleGlassProminent(rendering: .forceMaterial)
+            .compatibleGlassProminent(rendering: .material)
         )
 }
 #endif

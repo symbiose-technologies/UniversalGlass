@@ -13,7 +13,7 @@ public func GlassEffectContainer<Content: View>(
     spacing: CGFloat? = nil,
     @ViewBuilder content: @escaping () -> Content
 ) -> some View {
-    CompatibleGlassEffectContainer(spacing: spacing, content: content)
+    UniversalGlassEffectContainer(spacing: spacing, content: content)
 }
 
 @available(iOS, introduced: 13.0, obsoleted: 26.0)
@@ -27,7 +27,7 @@ public extension View {
         id: ID,
         namespace: Namespace.ID
     ) -> some View {
-        compatibleGlassEffectUnion(id: id, namespace: namespace)
+        universalGlassEffectUnion(id: id, namespace: namespace)
     }
 
     @ViewBuilder
@@ -35,7 +35,7 @@ public extension View {
         _ id: ID,
         in namespace: Namespace.ID
     ) -> some View {
-        compatibleGlassEffectID(id, in: namespace)
+        universalGlassEffectID(id, in: namespace)
     }
 }
 
@@ -51,7 +51,7 @@ public enum GlassEffectTransitionBackport: Sendable {
     case matchedGeometry
     case identity
 
-    fileprivate var compatibleValue: CompatibleGlassEffectTransition {
+    fileprivate var compatibleValue: UniversalGlassEffectTransition {
         switch self {
         case .materialize: return .materialize
         case .matchedGeometry: return .matchedGeometry
@@ -77,6 +77,6 @@ public extension View {
     func glassEffectTransition(
         _ transition: GlassEffectTransition
     ) -> some View {
-        compatibleGlassEffectTransition(transition.compatibleValue)
+        universalGlassEffectTransition(transition.compatibleValue)
     }
 }

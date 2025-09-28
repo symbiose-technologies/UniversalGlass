@@ -30,7 +30,7 @@ OS 26 introduces new SwiftUI glass APIs, but these only ship on the latest platf
 
 - **Glass for every surface** – Apply `compatibleGlassEffect` to any view, shape, or custom `CompatibleGlass` configuration. Liquid accents, tinting, and interactivity
 - **Buttons that feel native** – `.compatibleGlass()` and `.compatibleGlassProminent()` mirror the future SwiftUI button styles, including a custom material fallback that respects tint, control size, and press animations
-- **Containers & morphing** – Drop content into `CompatibleGlassEffectContainer` and use union/ID helpers to bridge to SwiftUI’s morphing APIs
+- **Containers & morphing** – Drop content into `UniversalGlassEffectContainer` and use union/ID helpers to bridge to SwiftUI’s morphing APIs
 - **Backports when you want them** – Import the optional `UniversalGlassBackports` target to get `.glass`, `.glassProminent`, and `.glassEffect`. They’re convenience shims that forward to the true SwiftUI APIs on iOS 26.
 - **Modular design** – Glass effects, button styles, transitions, and previews live in focused files
 
@@ -118,15 +118,15 @@ Legacy fallbacks apply a capsule material with tint-aware highlights, drop shado
 ```swift
 @Namespace private var glassNamespace
 
-CompatibleGlassEffectContainer(spacing: 24) {
+UniversalGlassEffectContainer(spacing: 24) {
     HStack(spacing: 16) {
         AvatarView()
             .compatibleGlassEffect()
-            .compatibleGlassEffectUnion(id: "profile", namespace: glassNamespace)
+            .universalGlassEffectUnion(id: "profile", namespace: glassNamespace)
 
         DetailsView()
             .compatibleGlassEffect()
-            .compatibleGlassEffectTransition(.matchedGeometry)
+            .universalGlassEffectTransition(.matchedGeometry)
     }
 }
 ```
