@@ -20,18 +20,17 @@
 
 ## Why UniversalGlass?
 
-iOS 26 (and its sibling releases) introduce beautiful new SwiftUI glass APIs—`glassEffect`, `.glass` button styles, liquid transitions—but those effects only ship on the latest platforms. UniversalGlass isn’t a pixel-perfect recreation; it offers compatibility layers and API conveniences so your code paths stay unified on older systems, then quietly defers to Apple’s implementation on platforms that ship it.
+OS 26 introduces new SwiftUI glass APIs, but these only ship on the latest platforms. UniversalGlass **isn't** a pixel-perfect recreation; it offers compatibility layers and API conveniences so your code paths stay unified on older systems, then quietly defers to Apple’s implementation on platforms that ship it.
 
 ---
 
 ## Highlights
 
-- **Glass for every surface** – Apply `compatibleGlassEffect` to any view, shape, or custom `CompatibleGlass` configuration. Liquid accents, tinting, and interactivity all work back to iOS 18.
-- **Buttons that feel native** – `.compatibleGlass()` and `.compatibleGlassProminent()` mirror the future SwiftUI button styles, including a custom material fallback that respects tint, control size, and press animations.
-- **Containers & morphing** – Drop content into `CompatibleGlassEffectContainer` and use union/ID helpers to bridge to SwiftUI’s morphing APIs when they exist.
-- **Transitions that sparkle** – `CompatibleGlassEffectTransition` and `AnyTransition.blur` give you glass-friendly transitions even when matched-geometry glass isn’t available yet.
-- **Backports when you want them** – Import the optional `UniversalGlassBackports` target to get `.glass`, `.glassProminent`, and `.glassEffect` names today. They’re convenience shims that forward to the true SwiftUI APIs on iOS 26.
-- **Modular design** – Glass effects, button styles, transitions, and previews live in focused files to make discovery and maintenance painless.
+- **Glass for every surface** – Apply `compatibleGlassEffect` to any view, shape, or custom `CompatibleGlass` configuration. Liquid accents, tinting, and interactivity
+- **Buttons that feel native** – `.compatibleGlass()` and `.compatibleGlassProminent()` mirror the future SwiftUI button styles, including a custom material fallback that respects tint, control size, and press animations
+- **Containers & morphing** – Drop content into `CompatibleGlassEffectContainer` and use union/ID helpers to bridge to SwiftUI’s morphing APIs
+- **Backports when you want them** – Import the optional `UniversalGlassBackports` target to get `.glass`, `.glassProminent`, and `.glassEffect`. They’re convenience shims that forward to the true SwiftUI APIs on iOS 26.
+- **Modular design** – Glass effects, button styles, transitions, and previews live in focused files
 
 ---
 
@@ -46,24 +45,18 @@ Add UniversalGlass to your Package.swift dependencies:
 Then add the target to any product that needs it:
 
 ```swift
-.target(
-    name: "YourFeature",
     dependencies: [
         .product(name: "UniversalGlass", package: "UniversalGlass")
     ]
-)
 ```
 
 Need the optional shorthand APIs (`.glass`, `.glassEffect`, etc.)? Add the backport module too:
 
 ```swift
-.target(
-    name: "YourFeature",
     dependencies: [
         .product(name: "UniversalGlass", package: "UniversalGlass"),
         .product(name: "UniversalGlassBackports", package: "UniversalGlass")
     ]
-)
 ```
 
 ---
@@ -112,7 +105,7 @@ Button("Join Beta") {
 .tint(.pink)
 .controlSize(.large)
 .buttonStyle(
-    .compatibleGlassProminent(rendering: .automatic)
+    .compatibleGlassProminent()
 )
 ```
 
@@ -150,7 +143,7 @@ VStack {
     }
 
     Toggle("Show Settings", isOn: $showSettings)
-        .compatibleGlassButtonStyle(rendering: .automatic)
+        .compatibleGlassButtonStyle()
 }
 .animation(.easeInOut(duration: 0.3), value: showSettings)
 ```
