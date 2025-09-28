@@ -105,6 +105,30 @@ public extension PrimitiveButtonStyle where Self == CompatibleGlassProminentButt
     }
 }
 
+// MARK: - Back-Deployed Aliases
+
+@available(iOS, introduced: 13.0, obsoleted: 26.0)
+@available(macOS, introduced: 11.0, obsoleted: 26.0)
+@available(macCatalyst, introduced: 13.0, obsoleted: 26.0)
+@available(tvOS, introduced: 18.0, obsoleted: 26.0)
+@available(watchOS, introduced: 11.0, obsoleted: 26.0)
+public extension PrimitiveButtonStyle where Self == CompatibleGlassButtonStyle {
+    static var glass: CompatibleGlassButtonStyle {
+        CompatibleGlassButtonStyle()
+    }
+}
+
+@available(iOS, introduced: 13.0, obsoleted: 26.0)
+@available(macOS, introduced: 11.0, obsoleted: 26.0)
+@available(macCatalyst, introduced: 13.0, obsoleted: 26.0)
+@available(tvOS, introduced: 18.0, obsoleted: 26.0)
+@available(watchOS, introduced: 11.0, obsoleted: 26.0)
+public extension PrimitiveButtonStyle where Self == CompatibleGlassProminentButtonStyle {
+    static var glassProminent: CompatibleGlassProminentButtonStyle {
+        CompatibleGlassProminentButtonStyle()
+    }
+}
+
 // MARK: - Backwards Compatible Modifiers
 
 public extension View {
@@ -113,9 +137,14 @@ public extension View {
         isProminent _: Bool = false,
         rendering: CompatibleGlassRendering = .automatic
     ) -> some View {
-        self.buttonStyle(
-            .compatibleGlass(rendering: rendering)
-        )
+        switch rendering {
+        case .automatic:
+            self.buttonStyle(.glass)
+        case .forceGlass, .forceMaterial:
+            self.buttonStyle(
+                .compatibleGlass(rendering: rendering)
+            )
+        }
     }
 
     @ViewBuilder
@@ -123,9 +152,14 @@ public extension View {
         isProminent _: Bool = true,
         rendering: CompatibleGlassRendering = .automatic
     ) -> some View {
-        self.buttonStyle(
-            .compatibleGlassProminent(rendering: rendering)
-        )
+        switch rendering {
+        case .automatic:
+            self.buttonStyle(.glassProminent)
+        case .forceGlass, .forceMaterial:
+            self.buttonStyle(
+                .compatibleGlassProminent(rendering: rendering)
+            )
+        }
     }
 }
 
@@ -135,9 +169,7 @@ public extension View {
         .font(.headline)
         .padding(.horizontal, 24)
         .padding(.vertical, 12)
-        .buttonStyle(
-            .compatibleGlass()
-        )
+        .buttonStyle(.glass)
 }
 
 #Preview("ButtonStyle: .compatibleGlassProminent") {
@@ -145,8 +177,6 @@ public extension View {
         .font(.headline)
         .padding(.horizontal, 24)
         .padding(.vertical, 12)
-        .buttonStyle(
-            .compatibleGlassProminent()
-        )
+        .buttonStyle(.glassProminent)
 }
 #endif
