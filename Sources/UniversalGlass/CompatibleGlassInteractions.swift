@@ -57,3 +57,95 @@ public extension View {
         }
     }
 }
+
+#if DEBUG
+private struct CompatibleGlassInteractionPreviewBackground<Content: View>: View {
+    private let height: CGFloat
+    private let content: Content
+
+    init(height: CGFloat = 360, @ViewBuilder content: () -> Content) {
+        self.height = height
+        self.content = content()
+    }
+
+    var body: some View {
+        ZStack {
+            LinearGradient(
+                colors: [
+                    Color(red: 0.10, green: 0.15, blue: 0.32),
+                    Color(red: 0.32, green: 0.12, blue: 0.36)
+                ],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+            .ignoresSafeArea()
+
+            content
+        }
+        .frame(maxWidth: .infinity)
+        .frame(height: height)
+        .padding()
+    }
+}
+
+#Preview("Modifier: compatibleScrollExtensionMode") {
+    CompatibleGlassInteractionPreviewBackground {
+        ScrollView {
+            VStack(spacing: 12) {
+                ForEach(1...8, id: \.self) { index in
+                    Label("Sidebar Row \(index)", systemImage: "rectangle.portrait")
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(16)
+                        .compatibleGlassEffect(rendering: .automatic)
+                }
+            }
+            .padding(.horizontal)
+            .padding(.vertical, 24)
+        }
+        .compatibleScrollExtensionMode(.underSidebar)
+    }
+}
+
+#Preview("Modifier: compatibleGlassEffectTransition") {
+    CompatibleGlassInteractionTransitionDemo()
+}
+
+private struct CompatibleGlassInteractionTransitionDemo: View {
+    @State private var showDetails = false
+
+    var body: some View {
+        CompatibleGlassInteractionPreviewBackground(height: 300) {
+            VStack(spacing: 20) {
+                Text("Toggle the card to preview the materialize glass transition.")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+
+                ZStack {
+                    if showDetails {
+                        VStack(spacing: 12) {
+                            Text("Now Playing")
+                                .font(.headline)
+                            Text("Liquid glass animates in with a materialize transition.")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                        .padding(24)
+                        .compatibleGlassEffect(rendering: .automatic)
+                        .compatibleGlassEffectTransition(.materialize)
+                        .transition(.scale(scale: 0.9).combined(with: .opacity))
+                    }
+                }
+                .frame(height: 160)
+
+                Button(showDetails ? "Hide Card" : "Show Card") {
+                    withAnimation(.spring(duration: 0.45)) {
+                        showDetails.toggle()
+                    }
+                }
+                .compatibleGlassProminentButtonStyle(rendering: .automatic)
+            }
+        }
+    }
+}
+#endif
