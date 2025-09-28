@@ -23,11 +23,23 @@ public struct CompatibleGlassButtonStyle: PrimitiveButtonStyle {
             if #available(iOS 26.0, macOS 26.0, *) {
                 GlassButtonStyle().makeBody(configuration: configuration)
             } else {
-                BorderedButtonStyle().makeBody(configuration: configuration)
+                fallbackBody(configuration: configuration, variant: .standard)
             }
         } else {
-            BorderedButtonStyle().makeBody(configuration: configuration)
+            fallbackBody(configuration: configuration, variant: .standard)
         }
+    }
+
+    @ViewBuilder
+    private func fallbackBody(
+        configuration: Configuration,
+        variant: CompatibleGlassLegacyButton.Variant
+    ) -> some View {
+        CompatibleGlassLegacyButton(
+            configuration: configuration,
+            rendering: rendering,
+            variant: variant
+        )
     }
 
     private var shouldUseGlass: Bool {
@@ -56,11 +68,23 @@ public struct CompatibleGlassProminentButtonStyle: PrimitiveButtonStyle {
             if #available(iOS 26.0, macOS 26.0, *) {
                 GlassProminentButtonStyle().makeBody(configuration: configuration)
             } else {
-                BorderedProminentButtonStyle().makeBody(configuration: configuration)
+                fallbackBody(configuration: configuration, variant: .prominent)
             }
         } else {
-            BorderedProminentButtonStyle().makeBody(configuration: configuration)
+            fallbackBody(configuration: configuration, variant: .prominent)
         }
+    }
+
+    @ViewBuilder
+    private func fallbackBody(
+        configuration: Configuration,
+        variant: CompatibleGlassLegacyButton.Variant
+    ) -> some View {
+        CompatibleGlassLegacyButton(
+            configuration: configuration,
+            rendering: rendering,
+            variant: variant
+        )
     }
 
     private var shouldUseGlass: Bool {
@@ -87,6 +111,150 @@ private func resolveShouldUseGlass(for rendering: CompatibleGlassRendering) -> B
     } else {
         return false
     }
+}
+
+// MARK: - Legacy Fallback Rendering
+
+// Provides a material-driven recreation of the glass button for platforms that
+// do not ship the native style (or when callers force material rendering).
+private struct CompatibleGlassLegacyButton: View {
+    enum Variant {
+        case standard
+        case prominent
+    }
+
+    let configuration: PrimitiveButtonStyle.Configuration
+    let rendering: CompatibleGlassRendering
+    let variant: Variant
+
+    @Environment(\.controlSize) private var controlSize
+    @Environment(\.isEnabled) private var isEnabled
+    @Environment(\.colorScheme) private var colorScheme
+
+    var body: some View {
+        configuration.label
+            .padding(padding)
+            .contentShape(.capsule)
+            .background(background)
+            .clipShape(Capsule())
+            .shadow(color: shadowColor, radius: shadowRadius, y: shadowYOffset)
+            .opacity(isEnabled ? 1 : 0.6)
+    }
+
+    private var padding: EdgeInsets {
+        let metrics = metrics(for: controlSize)
+        return EdgeInsets(
+            top: metrics.vertical,
+            leading: metrics.horizontal,
+            bottom: metrics.vertical,
+            trailing: metrics.horizontal
+        )
+    }
+
+    private func metrics(for controlSize: ControlSize) -> (horizontal: CGFloat, vertical: CGFloat) {
+        let prominent = variant == .prominent
+
+        switch controlSize {
+        case .mini:
+            return prominent ? (12, 6) : (10, 5)
+        case .small:
+            return prominent ? (14, 7) : (12, 6)
+        case .regular:
+            return prominent ? (18, 9) : (16, 8)
+        case .large:
+            return prominent ? (20, 10) : (18, 9)
+        case .extraLarge:
+            return prominent ? (24, 12) : (22, 11)
+        @unknown default:
+            return prominent ? (18, 9) : (16, 8)
+        }
+    }
+
+    @ViewBuilder
+    private var background: some View {
+        ZStack {
+            Color.clear
+                .compatibleGlassEffect(backgroundGlass, in: Capsule(), rendering: fallbackRendering)
+
+            Capsule()
+                .strokeBorder(borderGradient, lineWidth: borderWidth)
+                .blendMode(.plusLighter)
+                .opacity(borderOpacity)
+
+            Capsule()
+                .fill(highlightGradient)
+                .opacity(baseHighlightOpacity)
+        }
+    }
+
+    private var backgroundGlass: CompatibleGlass {
+        var glass: CompatibleGlass
+
+        switch variant {
+        case .standard:
+            glass = .clear
+        case .prominent:
+            glass = .regular
+        }
+
+        return glass.interactive()
+    }
+
+    private var fallbackRendering: CompatibleGlassRendering {
+        if #available(iOS 26.0, macOS 26.0, *), case .forceMaterial = rendering {
+            return .forceMaterial
+        }
+
+        return .automatic
+    }
+
+    private var borderWidth: CGFloat {
+        variant == .prominent ? 1.4 : 1
+    }
+
+    private var borderOpacity: CGFloat {
+        let base: CGFloat = variant == .prominent ? 0.7 : 0.5
+        return base * (isEnabled ? 1 : 0.45)
+    }
+
+    private var borderGradient: LinearGradient {
+        let top = Color.white.opacity(colorScheme == .dark ? 0.55 : 0.75)
+        let bottom = Color.white.opacity(colorScheme == .dark ? 0.15 : 0.25)
+        return LinearGradient(
+            colors: [top, bottom],
+            startPoint: .top,
+            endPoint: .bottom
+        )
+    }
+
+    private var highlightGradient: LinearGradient {
+        let start = Color.white.opacity(colorScheme == .dark ? 0.28 : 0.45)
+        let end = Color.white.opacity(colorScheme == .dark ? 0.05 : 0.12)
+        return LinearGradient(
+            colors: [start, end],
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        )
+    }
+
+    private var baseHighlightOpacity: CGFloat {
+        let base: CGFloat = variant == .prominent ? 0.24 : 0.18
+        return base * (isEnabled ? 1 : 0.55)
+    }
+
+    private var shadowColor: Color {
+        let base: Double = variant == .prominent ? 0.24 : 0.18
+        return Color.black.opacity(isEnabled ? base : base * 0.35)
+    }
+
+    private var shadowRadius: CGFloat {
+        variant == .prominent ? 14 : 10
+    }
+
+    private var shadowYOffset: CGFloat {
+        variant == .prominent ? 4 : 3
+    }
+
 }
 
 // MARK: - Static Helpers
@@ -184,5 +352,15 @@ public extension View {
         .padding(.horizontal, 24)
         .padding(.vertical, 12)
         .buttonStyle(.glassProminent)
+}
+
+#Preview("ButtonStyle: .glass (Material Fallback)") {
+    Button("Fallback Glass Button") {}
+        .font(.headline)
+        .padding(.horizontal, 24)
+        .padding(.vertical, 12)
+        .buttonStyle(
+            .compatibleGlass(rendering: .forceMaterial)
+        )
 }
 #endif
