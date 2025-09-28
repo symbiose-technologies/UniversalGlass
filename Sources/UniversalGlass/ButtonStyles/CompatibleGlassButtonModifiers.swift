@@ -44,7 +44,7 @@ public extension View {
 
 #if DEBUG
 #Preview("ButtonStyle: .glass") {
-    let sizes: [ControlSize] = [.mini, .small, .regular, .large, .extraLarge]
+    let sizes: [ControlSize] = [.mini, .small, .regular, .large]
 
     ScrollView {
         ForEach(sizes, id: \.self) { size in
@@ -69,7 +69,7 @@ public extension View {
 }
 
 #Preview("ButtonStyle: .glassProminent") {
-    let sizes: [ControlSize] = [.mini, .small, .regular, .large, .extraLarge]
+    let sizes: [ControlSize] = [.mini, .small, .regular, .large]
 
     ScrollView {
         ForEach(sizes, id: \.self) { size in
