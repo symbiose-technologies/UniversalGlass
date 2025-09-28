@@ -292,7 +292,7 @@ public enum CompatibleGlassRendering {
         .font(.title3.weight(.semibold))
         .padding(.horizontal, 36)
         .padding(.vertical, 16)
-        .compatibleGlassEffect(CompatibleGlass.regular.tint(.cyan))
+        .compatibleGlassEffect(.regular.tint(.cyan))
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(
             LinearGradient(
@@ -311,8 +311,28 @@ public enum CompatibleGlassRendering {
         .font(.title3.weight(.semibold))
         .padding(28)
         .compatibleGlassEffect(
-            CompatibleGlass.clear,
+            .clear,
             in: Capsule()
+        )
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(
+            LinearGradient(
+                colors: [
+                    Color(red: 0.05, green: 0.18, blue: 0.32),
+                    Color(red: 0.05, green: 0.38, blue: 0.48)
+                ],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+        )
+}
+
+#Preview("Modifier: compatibleGlassEffect (Glass + Interactive)") {
+    Text("Clear Interactive")
+        .font(.title3.weight(.semibold))
+        .padding(28)
+        .compatibleGlassEffect(
+            .clear.interactive()
         )
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(
