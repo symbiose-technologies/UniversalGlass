@@ -107,6 +107,9 @@ public extension PrimitiveButtonStyle where Self == CompatibleGlassProminentButt
 
 // MARK: - Back-Deployed Aliases
 
+// Availability gates let us surface `.glass` on older OSes; the extension returns our compatible
+// style type at runtime, so calling `.buttonStyle(.glass)` uses the fallback until SwiftUI 26+.
+
 @available(iOS, introduced: 13.0, obsoleted: 26.0)
 @available(macOS, introduced: 11.0, obsoleted: 26.0)
 @available(macCatalyst, introduced: 13.0, obsoleted: 26.0)
