@@ -70,8 +70,10 @@ public struct CompatibleGlassProminentButtonStyle: PrimitiveButtonStyle {
 
 // MARK: - Shared Resolution
 
+// `@inline(__always)` requests the compiler to substitute the function body at every call site.
 @inline(__always)
 private func resolveShouldUseGlass(for rendering: CompatibleGlassRendering) -> Bool {
+    // Inline to keep the availability-heavy branching from adding extra view layers.
     if #available(iOS 26.0, macOS 26.0, *) {
         if case .forceMaterial = rendering {
             return false
@@ -107,8 +109,7 @@ public extension PrimitiveButtonStyle where Self == CompatibleGlassProminentButt
 
 // MARK: - Back-Deployed Aliases
 
-// Availability gates let us surface `.glass` on older OSes; the extension returns our compatible
-// style type at runtime, so calling `.buttonStyle(.glass)` uses the fallback until SwiftUI 26+.
+// Availability ladders scope these shims to the window where the native `.glass` style is absent.
 
 @available(iOS, introduced: 13.0, obsoleted: 26.0)
 @available(macOS, introduced: 11.0, obsoleted: 26.0)
@@ -117,6 +118,7 @@ public extension PrimitiveButtonStyle where Self == CompatibleGlassProminentButt
 @available(watchOS, introduced: 11.0, obsoleted: 26.0)
 public extension PrimitiveButtonStyle where Self == CompatibleGlassButtonStyle {
     static var glass: CompatibleGlassButtonStyle {
+        // Within the back-deployment window, calling `.glass` returns our compatibility wrapper.
         CompatibleGlassButtonStyle()
     }
 }
@@ -128,6 +130,7 @@ public extension PrimitiveButtonStyle where Self == CompatibleGlassButtonStyle {
 @available(watchOS, introduced: 11.0, obsoleted: 26.0)
 public extension PrimitiveButtonStyle where Self == CompatibleGlassProminentButtonStyle {
     static var glassProminent: CompatibleGlassProminentButtonStyle {
+        // Same idea for prominent: older platforms map the alias to our custom primitive style.
         CompatibleGlassProminentButtonStyle()
     }
 }
