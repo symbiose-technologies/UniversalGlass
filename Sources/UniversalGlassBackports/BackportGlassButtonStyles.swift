@@ -37,7 +37,6 @@ public extension PrimitiveButtonStyle where Self == CompatibleGlassProminentButt
             .tint(.purple)
             .buttonStyle(.glassProminent)
     }
-    .padding(32)
     .frame(maxWidth: .infinity, maxHeight: .infinity)
     .background(Color.black.opacity(0.2).ignoresSafeArea())
 }
