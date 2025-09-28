@@ -190,17 +190,17 @@ private struct CompatibleGlassLegacyMaterialBody: View {
 
         switch controlSize {
         case .mini:
-            return prominent ? (12, 6) : (10, 5)
+            return prominent ? (12, 5) : (12, 5)
         case .small:
-            return prominent ? (14, 7) : (12, 6)
+            return prominent ? (12, 6) : (12, 6)
         case .regular:
-            return prominent ? (18, 9) : (16, 8)
+            return prominent ? (12, 7) : (12, 7)
         case .large:
-            return prominent ? (20, 10) : (18, 9)
+            return prominent ? (20, 15) : (20, 15)
         case .extraLarge:
-            return prominent ? (24, 12) : (22, 11)
+            return prominent ? (20, 15) : (20, 15)
         @unknown default:
-            return prominent ? (18, 9) : (16, 8)
+            return prominent ? (12, 7) : (12, 7)
         }
     }
 
@@ -253,7 +253,7 @@ private struct CompatibleGlassLegacyMaterialBody: View {
     }
 
     private var shadowColor: Color {
-        let base: Double = variant == .prominent ? 0.1 : 0.12
+        let base: Double = variant == .prominent ? 0.1 : 0.02
         return Color.black.opacity(isEnabled ? base : base * 0.35)
     }
 
@@ -352,26 +352,58 @@ public extension View {
 }
 
 #if DEBUG
-#Preview("ButtonStyle: .compatibleGlass") {
-    Button("Glass Button") {
-        print("Glass Button Pressed")
+#Preview("ButtonStyle: .glass") {
+    var sizes: [ControlSize] = [.mini, .small, .regular, .large, .extraLarge]
+    
+    ScrollView{
+        ForEach(sizes, id: \.self){ size in
+            VStack{
+                Button("Glass Button") {
+                    print("Glass Button Pressed")
+                }
+                .tint(.blue)
+                .font(.headline)
+                .buttonStyle(.glass)
+                
+                Button("Glass Button") {
+                    print("Glass Button Pressed")
+                }
+                .tint(.blue)
+                .font(.headline)
+                .buttonStyle(.compatibleGlass(rendering: .forceMaterial))
+            }
+            .padding(.vertical, 20)
+            .controlSize(size)
+            .frame(maxWidth: .infinity)
+        }
     }
-    .tint(.blue)
-        .font(.headline)
-        .padding(.horizontal, 24)
-        .padding(.vertical, 12)
-        .buttonStyle(.glass)
 }
 
-#Preview("ButtonStyle: .compatibleGlassProminent") {
-    Button("Prominent Glass Button") {
-        print("Prominent Glass Button Pressed")
+#Preview("ButtonStyle: .glassProminent") {
+    var sizes: [ControlSize] = [.mini, .small, .regular, .large, .extraLarge]
+    
+    ScrollView{
+        ForEach(sizes, id: \.self){ size in
+            VStack{
+                Button("Prominent Glass Button") {
+                    print("Prominent Glass Button Pressed")
+                }
+                .tint(.purple)
+                .font(.headline)
+                .buttonStyle(.glassProminent)
+                
+                Button("Prominent Glass Button") {
+                    print("Prominent Glass Button Pressed")
+                }
+                .tint(.purple)
+                .font(.headline)
+                .buttonStyle(.compatibleGlassProminent(rendering: .forceMaterial))
+            }
+            .padding(.vertical, 20)
+            .controlSize(size)
+            .frame(maxWidth: .infinity)
+        }
     }
-    .tint(.purple)
-        .font(.headline)
-        .padding(.horizontal, 24)
-        .padding(.vertical, 12)
-        .buttonStyle(.glassProminent)
 }
 
 #Preview("ButtonStyle: .glass (Material Fallback)") {
