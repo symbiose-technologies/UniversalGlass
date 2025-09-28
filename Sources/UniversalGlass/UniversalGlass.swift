@@ -435,7 +435,7 @@ public enum CompatibleGlassEffectTransition {
             .font(.title3.weight(.semibold))
             .padding(28)
             .compatibleGlassEffect(
-                CompatibleGlass.clear.tint(.pink),
+                CompatibleGlass.clear,
                 in: Capsule(),
                 rendering: .automatic
             )
@@ -526,6 +526,88 @@ public enum CompatibleGlassEffectTransition {
 #Preview("Modifier: compatibleGlassEffectUnion") {
     struct Demo: View {
         @Namespace private var namespace
+        @State private var mergeHighlights = true
+
+        private struct Card: Identifiable {
+            let id = UUID()
+            let title: String
+            let subtitle: String
+            let systemImage: String
+        }
+
+        private let cards: [Card] = [
+            .init(title: "Primary", subtitle: "Core functions", systemImage: "app.badge.fill"),
+            .init(title: "Secondary", subtitle: "Assistive tools", systemImage: "wand.and.stars"),
+            .init(title: "Background", subtitle: "Support services", systemImage: "bolt.fill")
+        ]
+
+        private var backgroundGradient: some View {
+            LinearGradient(
+                colors: [
+                    Color(red: 0.10, green: 0.15, blue: 0.32),
+                    Color(red: 0.32, green: 0.12, blue: 0.36)
+                ],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+            .ignoresSafeArea()
+        }
+
+        var body: some View {
+            ZStack {
+                backgroundGradient
+
+                VStack(spacing: 20) {
+                    Text("Toggle to see how glass unions merge adjacent cards inside a container.")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+
+                    CompatibleGlassEffectContainer(spacing: mergeHighlights ? 12 : 28, rendering: .automatic) {
+                        HStack(spacing: mergeHighlights ? 12 : 20) {
+                            ForEach(Array(cards.enumerated()), id: \.element.id) { index, card in
+                                VStack(alignment: .leading, spacing: 10) {
+                                    Image(systemName: card.systemImage)
+                                        .font(.system(size: 32, weight: .medium))
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                    Text(card.title)
+                                        .font(.headline)
+                                    Text(card.subtitle)
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                }
+                                .frame(maxWidth: .infinity)
+                                .padding(20)
+                                .compatibleGlassEffect(rendering: .automatic)
+                                .compatibleGlassEffectUnion(
+                                    id: mergeHighlights && index < 2 ? "primary" : "solo-\(index)",
+                                    namespace: namespace
+                                )
+                            }
+                        }
+                    }
+
+                    Button(mergeHighlights ? "Separate Highlights" : "Merge Highlights") {
+                        withAnimation(.spring(duration: 0.45)) {
+                            mergeHighlights.toggle()
+                        }
+                    }
+                    .compatibleGlassButtonStyle(rendering: .automatic)
+                }
+                .frame(maxWidth: .infinity)
+            }
+            .frame(maxWidth: .infinity)
+            .frame(height: 260)
+            .padding()
+        }
+    }
+
+    return Demo()
+}
+
+#Preview("Modifier: compatibleGlassEffectID") {
+    struct Demo: View {
+        @Namespace private var namespace
         @State private var showDetails = false
 
         private var backgroundGradient: some View {
@@ -544,26 +626,31 @@ public enum CompatibleGlassEffectTransition {
             ZStack {
                 backgroundGradient
 
-                VStack(spacing: 16) {
-                    Group {
-                        if showDetails {
-                            detailCard
-                                .compatibleGlassEffectUnion(id: "card", namespace: namespace)
-                                .frame(width: 220, height: 170)
-                        } else {
-                            summaryCard
-                                .compatibleGlassEffectUnion(id: "card", namespace: namespace)
-                                .frame(width: 200, height: 120)
+                VStack(spacing: 20) {
+                    Text("Toggle between compact and expanded cards that share the same glass identity.")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+
+                    CompatibleGlassEffectContainer(spacing: 24, rendering: .automatic) {
+                        Group {
+                            if showDetails {
+                                detailCard
+                                    .compatibleGlassEffectID("card", in: namespace)
+                            } else {
+                                summaryCard
+                                    .compatibleGlassEffectID("card", in: namespace)
+                            }
                         }
+                        .animation(.spring(duration: 0.45), value: showDetails)
                     }
-                    .animation(.spring(duration: 0.45), value: showDetails)
 
                     Button(showDetails ? "Show Summary" : "Show Details") {
                         withAnimation(.spring(duration: 0.45)) {
                             showDetails.toggle()
                         }
                     }
-                    .compatibleGlassButtonStyle(rendering: .automatic)
+                    .compatibleGlassProminentButtonStyle(rendering: .automatic)
                 }
                 .frame(maxWidth: .infinity)
             }
@@ -573,88 +660,32 @@ public enum CompatibleGlassEffectTransition {
         }
 
         private var summaryCard: some View {
-            VStack(alignment: .leading, spacing: 8) {
-                Text("Now Playing")
-                    .font(.headline)
-                Text("Glass morphing keeps the style consistent while resizing the content.")
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
-            }
-            .padding(20)
-            .compatibleGlassEffect(rendering: .automatic)
-        }
-
-        private var detailCard: some View {
             VStack(alignment: .leading, spacing: 12) {
-                Text("Midnight Waves")
-                    .font(.title3.weight(.semibold))
-                Label("Lo-Fi • 42 min", systemImage: "music.note")
-                    .font(.footnote)
+                Text("Design Summary")
+                    .font(.headline)
+                Text("Compact layout shares its glass identity with the expanded card.")
+                    .font(.caption)
                     .foregroundStyle(.secondary)
             }
             .padding(24)
             .compatibleGlassEffect(rendering: .automatic)
         }
-    }
 
-    return Demo()
-}
-
-#Preview("Modifier: compatibleGlassEffectID") {
-    struct Demo: View {
-        @Namespace private var namespace
-        @State private var selection = 0
-
-        private var backgroundGradient: some View {
-            LinearGradient(
-                colors: [
-                    Color(red: 0.10, green: 0.15, blue: 0.32),
-                    Color(red: 0.32, green: 0.12, blue: 0.36)
-                ],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
-            .ignoresSafeArea()
-        }
-
-        var body: some View {
-            ZStack {
-                backgroundGradient
-
-                VStack(spacing: 16) {
-                    Text("Tap a card to update the shared glass identity.")
-                        .font(.footnote)
-                        .foregroundStyle(.secondary)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-
-                    HStack(spacing: 16) {
-                        ForEach(0..<3, id: \.self) { index in
-                            VStack(spacing: 8) {
-                                Text("Option \(index + 1)")
-                                    .font(.headline)
-                                Text(selection == index ? "Selected" : "Tap to select")
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
-                            }
-                            .padding()
-                            .frame(width: 100, height: 120)
-                            .scaleEffect(selection == index ? 1.05 : 1)
-                            .animation(.spring(duration: 0.3), value: selection)
-                            .compatibleGlassEffect(rendering: .automatic)
-                            .compatibleGlassEffectID(index, in: namespace)
-                            .onTapGesture {
-                                withAnimation(.spring(duration: 0.35)) {
-                                    selection = index
-                                }
-                            }
-                        }
-                    }
-                }
-                .frame(maxWidth: .infinity)
+        private var detailCard: some View {
+            VStack(alignment: .leading, spacing: 16) {
+                Text("Expanded Details")
+                    .font(.headline)
+                Text("Liquid glass morphs smoothly thanks to matching IDs.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                Divider()
+                Label("Status", systemImage: "checkmark.seal")
+                    .font(.caption)
+                Label("Next Step", systemImage: "arrow.forward.circle")
+                    .font(.caption)
             }
-            .frame(maxWidth: .infinity)
-            .frame(height: 260)
-            .padding()
+            .padding(28)
+            .compatibleGlassEffect(rendering: .automatic)
         }
     }
 
