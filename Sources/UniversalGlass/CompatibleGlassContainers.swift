@@ -146,7 +146,7 @@ private struct GlassEffectContainerRenderer<Content: View>: View {
                 .environment(\.glassEffectParticipantContext, GlassEffectParticipantContext())
                 .environment(\.isInCompatibleGlassContainer, true)
         }
-        .overlayPreferenceValue(GlassEffectParticipantsKey.self) { participants in
+        .backgroundPreferenceValue(GlassEffectParticipantsKey.self) { participants in
             GeometryReader { proxy in
                 GlassEffectFallbackOverlay(participants: participants, proxy: proxy)
             }
