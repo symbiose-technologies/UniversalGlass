@@ -245,3 +245,79 @@ public enum CompatibleGlassRendering {
     /// Forces the material fallback even on platforms that support glass.
     case forceMaterial
 }
+
+#if DEBUG
+private struct CompatibleGlassEffectPreviewBackground<Content: View>: View {
+    private let height: CGFloat
+    private let content: Content
+
+    init(height: CGFloat = 280, @ViewBuilder content: () -> Content) {
+        self.height = height
+        self.content = content()
+    }
+
+    var body: some View {
+        ZStack {
+            LinearGradient(
+                colors: [
+                    Color(red: 0.10, green: 0.15, blue: 0.32),
+                    Color(red: 0.32, green: 0.12, blue: 0.36)
+                ],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+            .ignoresSafeArea()
+
+            content
+        }
+        .frame(maxWidth: .infinity)
+        .frame(height: height)
+        .padding()
+    }
+}
+
+#Preview("Modifier: compatibleGlassEffect") {
+    CompatibleGlassEffectPreviewBackground {
+        Text("Automatic Glass")
+            .font(.title3.weight(.semibold))
+            .padding(.horizontal, 36)
+            .padding(.vertical, 16)
+            .compatibleGlassEffect(rendering: .automatic)
+    }
+}
+
+#Preview("Modifier: compatibleGlassEffect (Shape)") {
+    CompatibleGlassEffectPreviewBackground {
+        Text("Custom Shape")
+            .font(.title3.weight(.semibold))
+            .padding(28)
+            .compatibleGlassEffect(
+                in: RoundedRectangle(cornerRadius: 28, style: .continuous),
+                rendering: .automatic
+            )
+    }
+}
+
+#Preview("Modifier: compatibleGlassEffect (Custom Glass)") {
+    CompatibleGlassEffectPreviewBackground {
+        Text("Tinted Regular Glass")
+            .font(.title3.weight(.semibold))
+            .padding(.horizontal, 36)
+            .padding(.vertical, 16)
+            .compatibleGlassEffect(CompatibleGlass.regular.tint(.cyan), rendering: .automatic)
+    }
+}
+
+#Preview("Modifier: compatibleGlassEffect (Glass + Shape)") {
+    CompatibleGlassEffectPreviewBackground {
+        Text("Clear Capsule")
+            .font(.title3.weight(.semibold))
+            .padding(28)
+            .compatibleGlassEffect(
+                CompatibleGlass.clear,
+                in: Capsule(),
+                rendering: .automatic
+            )
+    }
+}
+#endif
