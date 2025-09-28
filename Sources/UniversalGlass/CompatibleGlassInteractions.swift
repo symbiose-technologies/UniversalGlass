@@ -11,7 +11,8 @@ public enum CompatibleScrollExtensionMode {
 
 public enum CompatibleGlassEffectTransition {
     case materialize
-    case none
+    case matchedGeometry
+    case identity
 }
 
 // MARK: - Interaction Helpers
@@ -37,21 +38,17 @@ public extension View {
     /// Applies a glass effect transition with backward compatibility
     @ViewBuilder
     func compatibleGlassEffectTransition(
-        _ transition: CompatibleGlassEffectTransition,
-        rendering: CompatibleGlassRendering = .automatic
+        _ transition: CompatibleGlassEffectTransition
     ) -> some View {
         if #available(iOS 26.0, macOS 26.0, *) {
-            switch rendering {
-            case .forceMaterial:
-                self
-            case .automatic, .forceGlass:
                 switch transition {
                 case .materialize:
                     self.glassEffectTransition(.materialize)
-                case .none:
-                    self
+                case .matchedGeometry:
+                    self.glassEffectTransition(.matchedGeometry)
+                case .identity:
+                    self.glassEffectTransition(.identity)
                 }
-            }
         } else {
             self
         }
@@ -77,34 +74,64 @@ public extension View {
 }
 
 #Preview("Modifier: compatibleGlassEffectTransition") {
-    VStack(spacing: 20) {
-        Text("Materialize transition applied to incoming content.")
-            .font(.footnote)
-            .foregroundStyle(.secondary)
-            .frame(maxWidth: .infinity, alignment: .leading)
-
-        VStack(spacing: 12) {
-            Text("Now Playing")
-                .font(.headline)
-            Text("Liquid glass animates in with a materialize transition.")
-                .font(.caption)
-                .foregroundStyle(.secondary)
+    @Previewable @State var showMaterialize: Bool = true
+    @Previewable @State var showGeometry: Bool = true
+    @Previewable @State var showNone: Bool = true
+    
+    CompatibleGlassEffectContainer{
+        VStack(spacing: 20) {
+            if showMaterialize{
+                VStack(spacing: 12) {
+                    Text("Materialize transition.")
+                        .font(.headline)
+                }
+                .padding(24)
+                .compatibleGlassEffect()
+                .compatibleGlassEffectTransition(.materialize)
+            }
+            
+            if showGeometry{
+                VStack(spacing: 12) {
+                    Text("MatchedGeometry Transition.")
+                        .font(.headline)
+                }
+                .padding(24)
+                .compatibleGlassEffect()
+                .compatibleGlassEffectTransition(.matchedGeometry)
+            }
+            
+            if showNone{
+                VStack(spacing: 12) {
+                    Text("No Transition.")
+                        .font(.headline)
+                }
+                .padding(24)
+                .compatibleGlassEffect()
+                .compatibleGlassEffectTransition(.identity)
+            }
         }
-        .padding(24)
-        .compatibleGlassEffect(rendering: .automatic)
-        .compatibleGlassEffectTransition(.materialize)
-
-        VStack(spacing: 12) {
-            Text("Static State")
-                .font(.headline)
-            Text("No transition modifier applied here.")
-                .font(.caption)
-                .foregroundStyle(.secondary)
-        }
-        .padding(24)
-        .compatibleGlassEffect(rendering: .automatic)
-        .compatibleGlassEffectTransition(.none)
     }
-    .padding()
+    .frame(maxWidth: .infinity, maxHeight: .infinity)
+    .safeAreaInset(edge: .bottom, content: {
+        VStack{
+            Button("Toggle Materialize"){
+                withAnimation{
+                    showMaterialize.toggle()
+                }
+            }
+            Button("Toggle MatchedGeometry"){
+                withAnimation{
+                    showGeometry.toggle()
+                }
+            }
+            Button("Toggle None"){
+                withAnimation{
+                    showNone.toggle()
+                }
+            }
+        }
+        .foregroundStyle(.white)
+    })
+    .background(.pink.gradient)
 }
 #endif

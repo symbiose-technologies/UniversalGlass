@@ -5,7 +5,7 @@ import SwiftUI
 /// A container that optimizes rendering performance for multiple liquid glass effects
 @MainActor @ViewBuilder
 public func CompatibleGlassEffectContainer<Content: View>(
-    spacing: CGFloat,
+    spacing: CGFloat? = nil,
     rendering: CompatibleGlassRendering = .automatic,
     @ViewBuilder content: @escaping () -> Content
 ) -> some View {
