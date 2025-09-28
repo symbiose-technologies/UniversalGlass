@@ -4,51 +4,14 @@
   },
   "groups" : [
     {
-      "blur-material" : 1,
+      "blur-material" : 0.05,
       "layers" : [
         {
           "fill" : {
             "solid" : "srgb:1.00000,1.00000,1.00000,1.00000"
           },
-          "image-name" : "right.png",
-          "name" : "right",
-          "position" : {
-            "scale" : 1,
-            "translation-in-points" : [
-              689,
-              0
-            ]
-          }
-        }
-      ],
-      "lighting" : "individual",
-      "opacity" : 0.72,
-      "position" : {
-        "scale" : 0.479,
-        "translation-in-points" : [
-          -166,
-          0
-        ]
-      },
-      "shadow" : {
-        "kind" : "neutral",
-        "opacity" : 0.5
-      },
-      "specular" : false,
-      "translucency" : {
-        "enabled" : true,
-        "value" : 0
-      }
-    },
-    {
-      "blur-material" : 0.1,
-      "layers" : [
-        {
-          "fill" : {
-            "solid" : "srgb:1.00000,1.00000,1.00000,1.00000"
-          },
-          "image-name" : "left.png",
-          "name" : "left",
+          "image-name" : "Vector.svg",
+          "name" : "Vector",
           "position" : {
             "scale" : 1,
             "translation-in-points" : [
@@ -59,10 +22,11 @@
         }
       ],
       "lighting" : "individual",
+      "opacity" : 1,
       "position" : {
-        "scale" : 0.479,
+        "scale" : 0.59,
         "translation-in-points" : [
-          -166,
+          -103,
           0
         ]
       },
@@ -73,7 +37,44 @@
       "specular" : true,
       "translucency" : {
         "enabled" : true,
-        "value" : 0.69
+        "value" : 1
+      }
+    },
+    {
+      "blur-material" : 0.5,
+      "layers" : [
+        {
+          "fill" : {
+            "solid" : "srgb:1.00000,1.00000,1.00000,1.00000"
+          },
+          "image-name" : "Vector-1.svg",
+          "name" : "Vector-1",
+          "position" : {
+            "scale" : 1,
+            "translation-in-points" : [
+              350,
+              0
+            ]
+          }
+        }
+      ],
+      "lighting" : "individual",
+      "opacity" : 0.6,
+      "position" : {
+        "scale" : 0.59,
+        "translation-in-points" : [
+          -103,
+          0
+        ]
+      },
+      "shadow" : {
+        "kind" : "neutral",
+        "opacity" : 0.5
+      },
+      "specular" : false,
+      "translucency" : {
+        "enabled" : false,
+        "value" : 1
       }
     },
     {
