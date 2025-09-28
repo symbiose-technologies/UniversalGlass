@@ -6,8 +6,8 @@ import PackageDescription
 let package = Package(
     name: "UniversalGlass",
     platforms: [
-        .iOS(.v18),
-        .macOS(.v14),
+        .iOS(.v17),
+        .macOS(.v13),
         .watchOS(.v10),
         .tvOS(.v17)
     ],

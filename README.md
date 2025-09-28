@@ -1,21 +1,21 @@
 <div align="center">
+  <img width="270" height="270" src="/assets/icon.png" alt="UniversalGlass Logo">
   <h1><b>UniversalGlass</b></h1>
   <p>
     Bring SwiftUI’s iOS 26 glass APIs to earlier deployments with lightweight shims—keep your UI consistent on iOS 18+, yet automatically defer to the real implementations wherever they exist.
     <br>
-    <i>Optimised for iOS 18 · macOS 14 · tvOS 17 · watchOS 10</i>
   </p>
 </div>
 
 <p align="center">
-  <a href="https://developer.apple.com/ios/"><img src="https://badgen.net/badge/iOS/18+/purple" alt="iOS 18+"></a>
-  <a href="https://www.apple.com/macos/"><img src="https://badgen.net/badge/macOS/14+/blue" alt="macOS 14+"></a>
+  <a href="https://developer.apple.com/ios/"><img src="https://badgen.net/badge/iOS/17+/purple" alt="iOS 17+"></a>
+  <a href="https://www.apple.com/macos/"><img src="https://badgen.net/badge/macOS/13+/blue" alt="macOS 13+"></a>
   <a href="https://developer.apple.com/tvos/"><img src="https://badgen.net/badge/tvOS/17+/blue" alt="tvOS 17+"></a>
   <a href="https://developer.apple.com/watchos/"><img src="https://badgen.net/badge/watchOS/10+/blue" alt="watchOS 10+"></a>
   <a href="https://swift.org/"><img src="https://badgen.net/badge/Swift/6.0/orange" alt="Swift 6"></a>
   <a href="https://developer.apple.com/xcode/"><img src="https://badgen.net/badge/Xcode/16+/blue" alt="Xcode 16"></a>
 </p>
-
+        
 ---
 
 ## Why UniversalGlass?
