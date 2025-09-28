@@ -33,12 +33,16 @@ public struct CompatibleGlassButtonStyle: PrimitiveButtonStyle {
     @ViewBuilder
     private func fallbackBody(
         configuration: Configuration,
-        variant: CompatibleGlassLegacyButton.Variant
+        variant: CompatibleGlassLegacyVariant
     ) -> some View {
-        CompatibleGlassLegacyButton(
-            configuration: configuration,
-            rendering: rendering,
-            variant: variant
+        Button(action: configuration.trigger) {
+            configuration.label
+        }
+        .buttonStyle(
+            CompatibleGlassLegacyMaterialStyle(
+                rendering: rendering,
+                variant: variant
+            )
         )
     }
 
@@ -78,12 +82,16 @@ public struct CompatibleGlassProminentButtonStyle: PrimitiveButtonStyle {
     @ViewBuilder
     private func fallbackBody(
         configuration: Configuration,
-        variant: CompatibleGlassLegacyButton.Variant
+        variant: CompatibleGlassLegacyVariant
     ) -> some View {
-        CompatibleGlassLegacyButton(
-            configuration: configuration,
-            rendering: rendering,
-            variant: variant
+        Button(action: configuration.trigger) {
+            configuration.label
+        }
+        .buttonStyle(
+            CompatibleGlassLegacyMaterialStyle(
+                rendering: rendering,
+                variant: variant
+            )
         )
     }
 
@@ -115,21 +123,33 @@ private func resolveShouldUseGlass(for rendering: CompatibleGlassRendering) -> B
 
 // MARK: - Legacy Fallback Rendering
 
-// Provides a material-driven recreation of the glass button for platforms that
-// do not ship the native style (or when callers force material rendering).
-private struct CompatibleGlassLegacyButton: View {
-    enum Variant {
-        case standard
-        case prominent
-    }
+private enum CompatibleGlassLegacyVariant {
+    case standard
+    case prominent
+}
 
-    let configuration: PrimitiveButtonStyle.Configuration
+private struct CompatibleGlassLegacyMaterialStyle: ButtonStyle {
     let rendering: CompatibleGlassRendering
-    let variant: Variant
+    let variant: CompatibleGlassLegacyVariant
+
+    func makeBody(configuration: Configuration) -> some View {
+        CompatibleGlassLegacyMaterialBody(
+            configuration: configuration,
+            rendering: rendering,
+            variant: variant
+        )
+    }
+}
+
+private struct CompatibleGlassLegacyMaterialBody: View {
+    let configuration: ButtonStyle.Configuration
+    let rendering: CompatibleGlassRendering
+    let variant: CompatibleGlassLegacyVariant
 
     @Environment(\.controlSize) private var controlSize
     @Environment(\.isEnabled) private var isEnabled
     @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         configuration.label
@@ -139,6 +159,8 @@ private struct CompatibleGlassLegacyButton: View {
             .clipShape(Capsule())
             .shadow(color: shadowColor, radius: shadowRadius, y: shadowYOffset)
             .opacity(isEnabled ? 1 : 0.6)
+            .scaleEffect(configuration.isPressed ? 0.97 : 1)
+            .animation(animation, value: configuration.isPressed)
     }
 
     private var padding: EdgeInsets {
@@ -183,12 +205,12 @@ private struct CompatibleGlassLegacyButton: View {
 
             Capsule()
                 .fill(highlightGradient)
-                .opacity(baseHighlightOpacity)
+                .opacity(configuration.isPressed ? pressedHighlightOpacity : baseHighlightOpacity)
         }
     }
 
     private var backgroundGlass: CompatibleGlass {
-        var glass: CompatibleGlass
+        let glass: CompatibleGlass
 
         switch variant {
         case .standard:
@@ -242,6 +264,11 @@ private struct CompatibleGlassLegacyButton: View {
         return base * (isEnabled ? 1 : 0.55)
     }
 
+    private var pressedHighlightOpacity: CGFloat {
+        let base: CGFloat = variant == .prominent ? 0.35 : 0.26
+        return base * (isEnabled ? 1 : 0.55)
+    }
+
     private var shadowColor: Color {
         let base: Double = variant == .prominent ? 0.24 : 0.18
         return Color.black.opacity(isEnabled ? base : base * 0.35)
@@ -255,6 +282,9 @@ private struct CompatibleGlassLegacyButton: View {
         variant == .prominent ? 4 : 3
     }
 
+    private var animation: Animation? {
+        reduceMotion ? nil : .easeInOut(duration: 0.12)
+    }
 }
 
 // MARK: - Static Helpers
@@ -339,7 +369,9 @@ public extension View {
 
 #if DEBUG
 #Preview("ButtonStyle: .compatibleGlass") {
-    Button("Glass Button") {}
+    Button("Glass Button") {
+        print("Glass Button Pressed")
+    }
         .font(.headline)
         .padding(.horizontal, 24)
         .padding(.vertical, 12)
@@ -347,7 +379,9 @@ public extension View {
 }
 
 #Preview("ButtonStyle: .compatibleGlassProminent") {
-    Button("Prominent Glass Button") {}
+    Button("Prominent Glass Button") {
+        print("Prominent Glass Button Pressed")
+    }
         .font(.headline)
         .padding(.horizontal, 24)
         .padding(.vertical, 12)
@@ -355,7 +389,9 @@ public extension View {
 }
 
 #Preview("ButtonStyle: .glass (Material Fallback)") {
-    Button("Fallback Glass Button") {}
+    Button("Fallback Glass Button") {
+        print("Fallback Glass Button Pressed")
+    }
         .font(.headline)
         .padding(.horizontal, 24)
         .padding(.vertical, 12)
