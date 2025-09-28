@@ -76,6 +76,7 @@ public extension View {
             case .automatic, .forceGlass:
                 self.transformEnvironment(\.glassEffectParticipantContext) { context in
                     context.effectID = AnyHashable(id)
+                    context.union = GlassEffectUnion(id: AnyHashable(id), namespace: namespace)
                 }
             }
         }
@@ -143,6 +144,7 @@ private struct GlassEffectContainerRenderer<Content: View>: View {
         ZStack(alignment: .topLeading) {
             content()
                 .environment(\.glassEffectParticipantContext, GlassEffectParticipantContext())
+                .environment(\.isInCompatibleGlassContainer, true)
         }
         .overlayPreferenceValue(GlassEffectParticipantsKey.self) { participants in
             GeometryReader { proxy in
@@ -165,20 +167,21 @@ private struct ResolvedGlassEffectParticipant: Identifiable {
     let drawsOwnBackground: Bool
     let order: Int
 
-    var groupingKey: GlassEffectGroupingKey? {
+    var groupingKey: GlassEffectGroupingKey {
         if let union {
             return .union(union)
         }
         if let effectID {
             return .effectID(effectID)
         }
-        return nil
+        return .single(id)
     }
 }
 
 private enum GlassEffectGroupingKey: Hashable, Identifiable {
     case union(GlassEffectUnion)
     case effectID(AnyHashable)
+    case single(UUID)
 
     var id: AnyHashable {
         switch self {
@@ -186,10 +189,11 @@ private enum GlassEffectGroupingKey: Hashable, Identifiable {
             return AnyHashable(union)
         case .effectID(let value):
             return value
+        case .single(let uuid):
+            return AnyHashable(uuid)
         }
     }
 }
-
 private extension GlassEffectParticipant {
     func resolve(in proxy: GeometryProxy, order: Int) -> ResolvedGlassEffectParticipant {
         ResolvedGlassEffectParticipant(
@@ -219,7 +223,7 @@ private struct GlassEffectFallbackOverlay: View {
 
         var grouped: [GlassEffectGroupingKey: [ResolvedGlassEffectParticipant]] = [:]
         for participant in resolved {
-            guard let key = participant.groupingKey else { continue }
+            let key = participant.groupingKey
             grouped[key, default: []].append(participant)
         }
 
@@ -305,8 +309,8 @@ private struct GlassEffectUnionPreview: View {
                             .font(.title)
                             .frame(width: 80, height: 80)
                             .compatibleGlassEffect()
-                            .compatibleGlassEffectUnion(id: "star and moon", namespace: namespace)
                             .compatibleGlassEffectTransition(.matchedGeometry)
+                            .compatibleGlassEffectUnion(id: "star and moon", namespace: namespace)
                     }
                 }
 

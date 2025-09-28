@@ -24,6 +24,17 @@ extension EnvironmentValues {
     }
 }
 
+private struct IsInGlassContainerKey: EnvironmentKey {
+    static let defaultValue = false
+}
+
+extension EnvironmentValues {
+    var isInCompatibleGlassContainer: Bool {
+        get { self[IsInGlassContainerKey.self] }
+        set { self[IsInGlassContainerKey.self] = newValue }
+    }
+}
+
 struct AnyGlassShape: Shape {
     private let builder: @Sendable (CGRect) -> Path
 
@@ -37,10 +48,10 @@ struct AnyGlassShape: Shape {
 }
 
 struct GlassEffectParticipant: Identifiable {
-    let id = UUID()
+    let id: UUID
     let anchor: Anchor<CGRect>
-    let union: GlassEffectUnion?
-    let effectID: AnyHashable?
+    var union: GlassEffectUnion?
+    var effectID: AnyHashable?
     let transition: CompatibleGlassEffectTransition?
     let shape: AnyGlassShape?
     let glass: CompatibleGlass?
@@ -129,6 +140,7 @@ public extension View {
 
 private struct CompatibleGlassEffectModifier: ViewModifier {
     @Environment(\.glassEffectParticipantContext) private var context
+    @Environment(\.isInCompatibleGlassContainer) private var isInContainer
 
     let fallbackMaterial: Material
     let glassConfiguration: CompatibleGlass?
@@ -136,24 +148,16 @@ private struct CompatibleGlassEffectModifier: ViewModifier {
     let rendering: CompatibleGlassRendering
 
     func body(content: Content) -> some View {
-        let drawsBackground = context.union == nil && context.effectID == nil
+        let drawsBackground = !isInContainer
         let material = glassConfiguration?.fallbackMaterial ?? fallbackMaterial
         let targetShape = shape ?? AnyGlassShape(Capsule())
-        let base: AnyView
-
-        if drawsBackground {
-            base = AnyView(
-                content.modifier(
-                    CompatibleGlassFallbackBackground(material: material, shape: targetShape)
-                )
-            )
-        } else {
-            base = AnyView(content)
-        }
-
+        let base = drawsBackground
+            ? AnyView(content.modifier(CompatibleGlassFallbackBackground(material: material, shape: targetShape)))
+            : AnyView(content)
         return base
             .anchorPreference(key: GlassEffectParticipantsKey.self, value: .bounds) { anchor in
                 [GlassEffectParticipant(
+                    id: UUID(),
                     anchor: anchor,
                     union: context.union,
                     effectID: context.effectID,
@@ -165,9 +169,7 @@ private struct CompatibleGlassEffectModifier: ViewModifier {
                     drawsOwnBackground: drawsBackground
                 )]
             }
-            .transformEnvironment(\.glassEffectParticipantContext) { value in
-                value = GlassEffectParticipantContext()
-            }
+            .environment(\.glassEffectParticipantContext, GlassEffectParticipantContext())
     }
 }
 
