@@ -1,59 +1,152 @@
 import SwiftUI
 
-// MARK: - Compatible Button Styles
+// MARK: - Primitive Button Styles
+
+public struct CompatibleGlassButtonStyle: PrimitiveButtonStyle {
+    public typealias Body = AnyView
+
+    private let rendering: CompatibleGlassRendering
+
+    public init(
+        rendering: CompatibleGlassRendering = .automatic
+    ) {
+        self.rendering = rendering
+    }
+
+    public func makeBody(configuration: Configuration) -> AnyView {
+        AnyView(resolvedBody(configuration: configuration))
+    }
+
+    @ViewBuilder
+    private func resolvedBody(configuration: Configuration) -> some View {
+        if shouldUseGlass {
+            if #available(iOS 26.0, macOS 26.0, *) {
+                GlassButtonStyle().makeBody(configuration: configuration)
+            } else {
+                BorderedButtonStyle().makeBody(configuration: configuration)
+            }
+        } else {
+            BorderedButtonStyle().makeBody(configuration: configuration)
+        }
+    }
+
+    private var shouldUseGlass: Bool {
+        resolveShouldUseGlass(for: rendering)
+    }
+}
+
+public struct CompatibleGlassProminentButtonStyle: PrimitiveButtonStyle {
+    public typealias Body = AnyView
+
+    private let rendering: CompatibleGlassRendering
+
+    public init(
+        rendering: CompatibleGlassRendering = .automatic
+    ) {
+        self.rendering = rendering
+    }
+
+    public func makeBody(configuration: Configuration) -> AnyView {
+        AnyView(resolvedBody(configuration: configuration))
+    }
+
+    @ViewBuilder
+    private func resolvedBody(configuration: Configuration) -> some View {
+        if shouldUseGlass {
+            if #available(iOS 26.0, macOS 26.0, *) {
+                GlassProminentButtonStyle().makeBody(configuration: configuration)
+            } else {
+                BorderedProminentButtonStyle().makeBody(configuration: configuration)
+            }
+        } else {
+            BorderedProminentButtonStyle().makeBody(configuration: configuration)
+        }
+    }
+
+    private var shouldUseGlass: Bool {
+        resolveShouldUseGlass(for: rendering)
+    }
+}
+
+// MARK: - Shared Resolution
+
+@inline(__always)
+private func resolveShouldUseGlass(for rendering: CompatibleGlassRendering) -> Bool {
+    if #available(iOS 26.0, macOS 26.0, *) {
+        if case .forceMaterial = rendering {
+            return false
+        }
+
+        if case .forceGlass = rendering {
+            return true
+        }
+
+        return true
+    } else {
+        return false
+    }
+}
+
+// MARK: - Static Helpers
+
+public extension PrimitiveButtonStyle where Self == CompatibleGlassButtonStyle {
+    static func compatibleGlass(
+        rendering: CompatibleGlassRendering = .automatic
+    ) -> CompatibleGlassButtonStyle {
+        CompatibleGlassButtonStyle(rendering: rendering)
+    }
+}
+
+public extension PrimitiveButtonStyle where Self == CompatibleGlassProminentButtonStyle {
+    static func compatibleGlassProminent(
+        rendering: CompatibleGlassRendering = .automatic
+    ) -> CompatibleGlassProminentButtonStyle {
+        CompatibleGlassProminentButtonStyle(rendering: rendering)
+    }
+}
+
+// MARK: - Backwards Compatible Modifiers
 
 public extension View {
     @ViewBuilder
     func compatibleGlassButtonStyle(
-        isProminent: Bool = false,
+        isProminent _: Bool = false,
         rendering: CompatibleGlassRendering = .automatic
     ) -> some View {
-        if #available(iOS 26.0, macOS 26.0, *) {
-            switch rendering {
-            case .forceMaterial:
-                self.buttonStyle(.bordered)
-            case .automatic, .forceGlass:
-                self.buttonStyle(.glass)
-            }
-        } else {
-            self.buttonStyle(.bordered)
-        }
+        self.buttonStyle(
+            .compatibleGlass(rendering: rendering)
+        )
     }
-}
 
-public extension View {
     @ViewBuilder
     func compatibleGlassProminentButtonStyle(
-        isProminent: Bool = false,
+        isProminent _: Bool = true,
         rendering: CompatibleGlassRendering = .automatic
     ) -> some View {
-        if #available(iOS 26.0, macOS 26.0, *) {
-            switch rendering {
-            case .forceMaterial:
-                self.buttonStyle(.borderedProminent)
-            case .automatic, .forceGlass:
-                self.buttonStyle(.glassProminent)
-            }
-        } else {
-            self.buttonStyle(.borderedProminent)
-        }
+        self.buttonStyle(
+            .compatibleGlassProminent(rendering: rendering)
+        )
     }
 }
 
 #if DEBUG
-#Preview("Modifier: compatibleGlassButtonStyle") {
+#Preview("ButtonStyle: .compatibleGlass") {
     Button("Glass Button") {}
         .font(.headline)
         .padding(.horizontal, 24)
         .padding(.vertical, 12)
-        .compatibleGlassButtonStyle(isProminent: false, rendering: .automatic)
+        .buttonStyle(
+            .compatibleGlass()
+        )
 }
 
-#Preview("Modifier: compatibleGlassProminentButtonStyle") {
+#Preview("ButtonStyle: .compatibleGlassProminent") {
     Button("Prominent Glass Button") {}
         .font(.headline)
         .padding(.horizontal, 24)
         .padding(.vertical, 12)
-        .compatibleGlassProminentButtonStyle(isProminent: true, rendering: .automatic)
+        .buttonStyle(
+            .compatibleGlassProminent()
+        )
 }
 #endif
