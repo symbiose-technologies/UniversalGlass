@@ -344,3 +344,422 @@ public enum CompatibleGlassEffectTransition {
     case materialize
     case none
 }
+
+// MARK: - Previews
+
+#if DEBUG
+#Preview("Modifier: compatibleGlassEffect") {
+    ZStack {
+        LinearGradient(
+            colors: [
+                Color(red: 0.10, green: 0.15, blue: 0.32),
+                Color(red: 0.32, green: 0.12, blue: 0.36)
+            ],
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        )
+        .ignoresSafeArea()
+
+        Text("Automatic Glass")
+            .font(.title3.weight(.semibold))
+            .padding(.horizontal, 36)
+            .padding(.vertical, 16)
+            .compatibleGlassEffect(rendering: .automatic)
+    }
+    .frame(maxWidth: .infinity)
+    .frame(height: 280)
+    .padding()
+}
+
+#Preview("Modifier: compatibleGlassEffect (Shape)") {
+    ZStack {
+        LinearGradient(
+            colors: [
+                Color(red: 0.10, green: 0.15, blue: 0.32),
+                Color(red: 0.32, green: 0.12, blue: 0.36)
+            ],
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        )
+        .ignoresSafeArea()
+
+        Text("Custom Shape")
+            .font(.title3.weight(.semibold))
+            .padding(28)
+            .compatibleGlassEffect(
+                in: RoundedRectangle(cornerRadius: 28, style: .continuous),
+                rendering: .automatic
+            )
+    }
+    .frame(maxWidth: .infinity)
+    .frame(height: 280)
+    .padding()
+}
+
+#Preview("Modifier: compatibleGlassEffect (Custom Glass)") {
+    ZStack {
+        LinearGradient(
+            colors: [
+                Color(red: 0.10, green: 0.15, blue: 0.32),
+                Color(red: 0.32, green: 0.12, blue: 0.36)
+            ],
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        )
+        .ignoresSafeArea()
+
+        Text("Tinted Regular Glass")
+            .font(.title3.weight(.semibold))
+            .padding(.horizontal, 36)
+            .padding(.vertical, 16)
+            .compatibleGlassEffect(CompatibleGlass.regular.tint(.cyan), rendering: .automatic)
+    }
+    .frame(maxWidth: .infinity)
+    .frame(height: 280)
+    .padding()
+}
+
+#Preview("Modifier: compatibleGlassEffect (Glass + Shape)") {
+    ZStack {
+        LinearGradient(
+            colors: [
+                Color(red: 0.10, green: 0.15, blue: 0.32),
+                Color(red: 0.32, green: 0.12, blue: 0.36)
+            ],
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        )
+        .ignoresSafeArea()
+
+        Text("Clear Capsule")
+            .font(.title3.weight(.semibold))
+            .padding(28)
+            .compatibleGlassEffect(
+                CompatibleGlass.clear.tint(.pink),
+                in: Capsule(),
+                rendering: .automatic
+            )
+    }
+    .frame(maxWidth: .infinity)
+    .frame(height: 280)
+    .padding()
+}
+
+#Preview("Modifier: compatibleGlassButtonStyle") {
+    ZStack {
+        LinearGradient(
+            colors: [
+                Color(red: 0.10, green: 0.15, blue: 0.32),
+                Color(red: 0.32, green: 0.12, blue: 0.36)
+            ],
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        )
+        .ignoresSafeArea()
+
+        Button("Glass Button") {}
+            .font(.headline)
+            .padding(.horizontal, 24)
+            .padding(.vertical, 12)
+            .compatibleGlassButtonStyle(isProminent: false, rendering: .automatic)
+    }
+    .frame(maxWidth: .infinity)
+    .frame(height: 220)
+    .padding()
+}
+
+#Preview("Modifier: compatibleGlassProminentButtonStyle") {
+    ZStack {
+        LinearGradient(
+            colors: [
+                Color(red: 0.10, green: 0.15, blue: 0.32),
+                Color(red: 0.32, green: 0.12, blue: 0.36)
+            ],
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        )
+        .ignoresSafeArea()
+
+        Button("Prominent Glass Button") {}
+            .font(.headline)
+            .padding(.horizontal, 24)
+            .padding(.vertical, 12)
+            .compatibleGlassProminentButtonStyle(isProminent: true, rendering: .automatic)
+    }
+    .frame(maxWidth: .infinity)
+    .frame(height: 220)
+    .padding()
+}
+
+#Preview("Container: CompatibleGlassEffectContainer") {
+    ZStack {
+        LinearGradient(
+            colors: [
+                Color(red: 0.10, green: 0.15, blue: 0.32),
+                Color(red: 0.32, green: 0.12, blue: 0.36)
+            ],
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        )
+        .ignoresSafeArea()
+
+        CompatibleGlassEffectContainer(spacing: 16, rendering: .automatic) {
+            ForEach(1...3, id: \.self) { index in
+                VStack(spacing: 8) {
+                    Text("Item \(index)")
+                        .font(.headline)
+                    Text("Rendered inside a container optimized for liquid glass.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                .padding(20)
+                .compatibleGlassEffect(rendering: .automatic)
+            }
+        }
+        .padding(.horizontal, 4)
+    }
+    .frame(maxWidth: .infinity)
+    .frame(height: 320)
+    .padding()
+}
+
+#Preview("Modifier: compatibleGlassEffectUnion") {
+    struct Demo: View {
+        @Namespace private var namespace
+        @State private var showDetails = false
+
+        private var backgroundGradient: some View {
+            LinearGradient(
+                colors: [
+                    Color(red: 0.10, green: 0.15, blue: 0.32),
+                    Color(red: 0.32, green: 0.12, blue: 0.36)
+                ],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+            .ignoresSafeArea()
+        }
+
+        var body: some View {
+            ZStack {
+                backgroundGradient
+
+                VStack(spacing: 16) {
+                    Group {
+                        if showDetails {
+                            detailCard
+                                .compatibleGlassEffectUnion(id: "card", namespace: namespace)
+                                .frame(width: 220, height: 170)
+                        } else {
+                            summaryCard
+                                .compatibleGlassEffectUnion(id: "card", namespace: namespace)
+                                .frame(width: 200, height: 120)
+                        }
+                    }
+                    .animation(.spring(duration: 0.45), value: showDetails)
+
+                    Button(showDetails ? "Show Summary" : "Show Details") {
+                        withAnimation(.spring(duration: 0.45)) {
+                            showDetails.toggle()
+                        }
+                    }
+                    .compatibleGlassButtonStyle(rendering: .automatic)
+                }
+                .frame(maxWidth: .infinity)
+            }
+            .frame(maxWidth: .infinity)
+            .frame(height: 260)
+            .padding()
+        }
+
+        private var summaryCard: some View {
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Now Playing")
+                    .font(.headline)
+                Text("Glass morphing keeps the style consistent while resizing the content.")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+            }
+            .padding(20)
+            .compatibleGlassEffect(rendering: .automatic)
+        }
+
+        private var detailCard: some View {
+            VStack(alignment: .leading, spacing: 12) {
+                Text("Midnight Waves")
+                    .font(.title3.weight(.semibold))
+                Label("Lo-Fi • 42 min", systemImage: "music.note")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+            }
+            .padding(24)
+            .compatibleGlassEffect(rendering: .automatic)
+        }
+    }
+
+    return Demo()
+}
+
+#Preview("Modifier: compatibleGlassEffectID") {
+    struct Demo: View {
+        @Namespace private var namespace
+        @State private var selection = 0
+
+        private var backgroundGradient: some View {
+            LinearGradient(
+                colors: [
+                    Color(red: 0.10, green: 0.15, blue: 0.32),
+                    Color(red: 0.32, green: 0.12, blue: 0.36)
+                ],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+            .ignoresSafeArea()
+        }
+
+        var body: some View {
+            ZStack {
+                backgroundGradient
+
+                VStack(spacing: 16) {
+                    Text("Tap a card to update the shared glass identity.")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+
+                    HStack(spacing: 16) {
+                        ForEach(0..<3, id: \.self) { index in
+                            VStack(spacing: 8) {
+                                Text("Option \(index + 1)")
+                                    .font(.headline)
+                                Text(selection == index ? "Selected" : "Tap to select")
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            }
+                            .padding()
+                            .frame(width: 100, height: 120)
+                            .scaleEffect(selection == index ? 1.05 : 1)
+                            .animation(.spring(duration: 0.3), value: selection)
+                            .compatibleGlassEffect(rendering: .automatic)
+                            .compatibleGlassEffectID(index, in: namespace)
+                            .onTapGesture {
+                                withAnimation(.spring(duration: 0.35)) {
+                                    selection = index
+                                }
+                            }
+                        }
+                    }
+                }
+                .frame(maxWidth: .infinity)
+            }
+            .frame(maxWidth: .infinity)
+            .frame(height: 260)
+            .padding()
+        }
+    }
+
+    return Demo()
+}
+
+#Preview("Modifier: compatibleScrollExtensionMode") {
+    struct Demo: View {
+        private var backgroundGradient: some View {
+            LinearGradient(
+                colors: [
+                    Color(red: 0.10, green: 0.15, blue: 0.32),
+                    Color(red: 0.32, green: 0.12, blue: 0.36)
+                ],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+            .ignoresSafeArea()
+        }
+
+        var body: some View {
+            ZStack {
+                backgroundGradient
+
+                ScrollView {
+                    VStack(spacing: 12) {
+                        ForEach(1...8, id: \.self) { index in
+                            Label("Sidebar Row \(index)", systemImage: "rectangle.portrait")
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .padding(16)
+                                .compatibleGlassEffect(rendering: .automatic)
+                        }
+                    }
+                    .padding(.horizontal)
+                    .padding(.vertical, 24)
+                }
+                .compatibleScrollExtensionMode(.underSidebar)
+            }
+            .frame(maxWidth: .infinity)
+            .frame(height: 360)
+            .padding()
+        }
+    }
+
+    return Demo()
+}
+
+#Preview("Modifier: compatibleGlassEffectTransition") {
+    struct Demo: View {
+        @State private var showDetails = false
+
+        private var backgroundGradient: some View {
+            LinearGradient(
+                colors: [
+                    Color(red: 0.10, green: 0.15, blue: 0.32),
+                    Color(red: 0.32, green: 0.12, blue: 0.36)
+                ],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+            .ignoresSafeArea()
+        }
+
+        var body: some View {
+            ZStack {
+                backgroundGradient
+
+                VStack(spacing: 20) {
+                    Text("Toggle the card to preview the materialize glass transition.")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+
+                    ZStack {
+                        if showDetails {
+                            VStack(spacing: 12) {
+                                Text("Now Playing")
+                                    .font(.headline)
+                                Text("Liquid glass animates in with a materialize transition.")
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            }
+                            .padding(24)
+                            .compatibleGlassEffect(rendering: .automatic)
+                            .compatibleGlassEffectTransition(.materialize)
+                            .transition(.scale(scale: 0.9).combined(with: .opacity))
+                        }
+                    }
+                    .frame(height: 160)
+
+                    Button(showDetails ? "Hide Card" : "Show Card") {
+                        withAnimation(.spring(duration: 0.45)) {
+                            showDetails.toggle()
+                        }
+                    }
+                    .compatibleGlassProminentButtonStyle(rendering: .automatic)
+                }
+                .frame(maxWidth: .infinity)
+            }
+            .frame(maxWidth: .infinity)
+            .frame(height: 300)
+            .padding()
+        }
+    }
+
+    return Demo()
+}
+#endif
