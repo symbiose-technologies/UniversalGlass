@@ -337,7 +337,7 @@ private struct GlassEffectUnionPreview: View {
                         .compatibleGlassEffect()
                     
                     if showMoon {
-                        Image(systemName: "moon")
+                        Image(systemName: "cloud")
                             .font(.title)
                             .frame(width: 80, height: 80)
                             .compatibleGlassEffect()
@@ -346,7 +346,7 @@ private struct GlassEffectUnionPreview: View {
                     }
                     
                     if showMoon {
-                        Image(systemName: "moon")
+                        Image(systemName: "sunglasses")
                             .font(.title)
                             .frame(width: 80, height: 80)
                             .compatibleGlassEffect()
@@ -385,7 +385,7 @@ private struct GlassEffectUnionPreview: View {
                         .compatibleGlassEffect()
                     
                     if showMoon {
-                        Image(systemName: "moon")
+                        Image(systemName: "cloud")
                             .font(.title)
                             .frame(width: 80, height: 80)
                             .compatibleGlassEffect(rendering: .forceMaterial)
@@ -394,7 +394,7 @@ private struct GlassEffectUnionPreview: View {
                     }
                     
                     if showMoon {
-                        Image(systemName: "moon")
+                        Image(systemName: "sunglasses")
                             .font(.title)
                             .frame(width: 80, height: 80)
                             .compatibleGlassEffect(rendering: .forceMaterial)
@@ -407,9 +407,20 @@ private struct GlassEffectUnionPreview: View {
         }
         .padding(.horizontal, 60)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .overlay(content: {
+            HStack{
+                Text("Liquid Glass").frame(maxWidth: .infinity)
+                
+                Text("Fallback").frame(maxWidth: .infinity)
+            }
+            .padding(.horizontal, 60)
+            .offset(y: 270)
+            .font(.body.weight(.semibold))
+            .foregroundStyle(.white)
+        })
         .safeAreaInset(edge: .bottom) {
             VStack(spacing: 12) {
-                Button(showMoon ? "Hide Moon" : "Show Moon") {
+                Button(showMoon ? "Hide" : "Show") {
                     withAnimation(.spring(duration: 0.45)) {
                         showMoon.toggle()
                     }
@@ -420,8 +431,8 @@ private struct GlassEffectUnionPreview: View {
         .background(
             LinearGradient(
                 colors: [
-                    Color(red: 0.15, green: 0.08, blue: 0.32),
-                    Color(red: 0.40, green: 0.10, blue: 0.36)
+                    Color(red: 0.15, green: 0.58, blue: 0.72),
+                    Color(red: 0.40, green: 0.30, blue: 0.86)
                 ],
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
