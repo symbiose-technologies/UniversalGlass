@@ -1,9 +1,9 @@
 import SwiftUI
 
-// MARK: - Compatible Glass Configuration
+// MARK: - Universal Glass Configuration
 
 /// A configuration type that provides liquid glass effects on iOS 26+ and material fallbacks on older versions.
-public struct CompatibleGlass {
+public struct UniversalGlass {
     let fallbackMaterial: Material
     private let _liquidGlass: Any?
 
@@ -18,113 +18,113 @@ public struct CompatibleGlass {
     }
 
     /// Regular liquid glass effect with regular material fallback.
-    nonisolated(unsafe) public static let regular: CompatibleGlass = {
+    nonisolated(unsafe) public static let regular: UniversalGlass = {
         if #available(iOS 26.0, macOS 26.0, *) {
-            return CompatibleGlass(
+            return UniversalGlass(
                 fallbackMaterial: .regularMaterial,
                 liquidGlass: Glass.regular
             )
         } else {
-            return CompatibleGlass(fallbackMaterial: .regularMaterial)
+            return UniversalGlass(fallbackMaterial: .regularMaterial)
         }
     }()
 
     /// Thick liquid glass effect with thick material fallback.
-    nonisolated(unsafe) public static let thick: CompatibleGlass = {
+    nonisolated(unsafe) public static let thick: UniversalGlass = {
         if #available(iOS 26.0, macOS 26.0, *) {
-            return CompatibleGlass(
+            return UniversalGlass(
                 fallbackMaterial: .thickMaterial,
                 liquidGlass: Glass.regular
             )
         } else {
-            return CompatibleGlass(fallbackMaterial: .thickMaterial)
+            return UniversalGlass(fallbackMaterial: .thickMaterial)
         }
     }()
 
     /// Thin liquid glass effect with thin material fallback.
-    nonisolated(unsafe) public static let thin: CompatibleGlass = {
+    nonisolated(unsafe) public static let thin: UniversalGlass = {
         if #available(iOS 26.0, macOS 26.0, *) {
-            return CompatibleGlass(
+            return UniversalGlass(
                 fallbackMaterial: .thinMaterial,
                 liquidGlass: Glass.regular
             )
         } else {
-            return CompatibleGlass(fallbackMaterial: .thinMaterial)
+            return UniversalGlass(fallbackMaterial: .thinMaterial)
         }
     }()
 
     /// Ultra thin liquid glass effect with ultra thin material fallback.
-    nonisolated(unsafe) public static let ultraThin: CompatibleGlass = {
+    nonisolated(unsafe) public static let ultraThin: UniversalGlass = {
         if #available(iOS 26.0, macOS 26.0, *) {
-            return CompatibleGlass(
+            return UniversalGlass(
                 fallbackMaterial: .ultraThinMaterial,
                 liquidGlass: Glass.regular
             )
         } else {
-            return CompatibleGlass(fallbackMaterial: .ultraThinMaterial)
+            return UniversalGlass(fallbackMaterial: .ultraThinMaterial)
         }
     }()
 
     /// Clear liquid glass effect with ultra thin material fallback.
-    nonisolated(unsafe) public static let clear: CompatibleGlass = {
+    nonisolated(unsafe) public static let clear: UniversalGlass = {
         if #available(iOS 26.0, macOS 26.0, *) {
-            return CompatibleGlass(
+            return UniversalGlass(
                 fallbackMaterial: .ultraThinMaterial,
                 liquidGlass: Glass.clear
             )
         } else {
-            return CompatibleGlass(fallbackMaterial: .ultraThinMaterial)
+            return UniversalGlass(fallbackMaterial: .ultraThinMaterial)
         }
     }()
 
     /// Creates a tinted liquid glass effect with the specified color.
     /// Falls back to regular material on older versions.
-    public func tint(_ color: Color) -> CompatibleGlass {
+    public func tint(_ color: Color) -> UniversalGlass {
         if #available(iOS 26.0, macOS 26.0, *) {
             if let existingGlass = liquidGlass {
                 let tintedGlass: Any = existingGlass.tint(color)
-                return CompatibleGlass(
+                return UniversalGlass(
                     fallbackMaterial: fallbackMaterial,
                     liquidGlass: tintedGlass
                 )
             } else {
                 let tintedGlass: Any = Glass.regular.tint(color)
-                return CompatibleGlass(
+                return UniversalGlass(
                     fallbackMaterial: fallbackMaterial,
                     liquidGlass: tintedGlass
                 )
             }
         } else {
-            return CompatibleGlass(fallbackMaterial: fallbackMaterial)
+            return UniversalGlass(fallbackMaterial: fallbackMaterial)
         }
     }
 
     /// Creates an interactive liquid glass effect.
     /// Falls back to the same material on older versions.
-    public func interactive(_ isInteractive: Bool = true) -> CompatibleGlass {
+    public func interactive(_ isInteractive: Bool = true) -> UniversalGlass {
         if #available(iOS 26.0, macOS 26.0, *) {
             if let existingGlass = liquidGlass {
                 let interactiveGlass: Any = existingGlass.interactive(isInteractive)
-                return CompatibleGlass(
+                return UniversalGlass(
                     fallbackMaterial: fallbackMaterial,
                     liquidGlass: interactiveGlass
                 )
             } else {
                 let interactiveGlass: Any = Glass.regular.interactive(isInteractive)
-                return CompatibleGlass(
+                return UniversalGlass(
                     fallbackMaterial: fallbackMaterial,
                     liquidGlass: interactiveGlass
                 )
             }
         } else {
-            return CompatibleGlass(fallbackMaterial: fallbackMaterial)
+            return UniversalGlass(fallbackMaterial: fallbackMaterial)
         }
     }
 }
 
-// MARK: - Compatible Glass Rendering
+// MARK: - Universal Glass Rendering
 
-/// Determines how compatible glass APIs render across different versions.
+/// Determines how universal glass APIs render across different versions.
 public enum UniversalGlassRendering {
     /// Uses glass on supported versions and falls back automatically otherwise.
     case automatic

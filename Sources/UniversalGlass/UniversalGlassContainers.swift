@@ -86,7 +86,7 @@ public extension View {
     }
 }
 
-// MARK: - Compatible Glass Effect Transition
+// MARK: - Universal Glass Effect Transition
 
 public enum UniversalGlassEffectTransition {
     case materialize
@@ -164,7 +164,7 @@ private struct ResolvedGlassEffectParticipant: Identifiable {
     let effectID: AnyHashable?
     let transition: UniversalGlassEffectTransition?
     let shape: AnyGlassShape?
-    let glass: CompatibleGlass?
+    let glass: UniversalGlass?
     let fallbackMaterial: Material
     let rendering: UniversalGlassRendering
     let drawsOwnBackground: Bool
@@ -296,14 +296,14 @@ private struct GlassEffectUnionPreview: View {
                             Image(systemName: "moon")
                                 .font(.title)
                                 .frame(width: 80, height: 80)
-                                .compatibleGlassEffect()
+                                .universalGlassEffect()
                                 .universalGlassEffectTransition(.matchedGeometry)
                                 .universalGlassEffectUnion(id: "star and moon", namespace: namespace)
                         }
                         Image(systemName: "star")
                             .font(.title)
                             .frame(width: 80, height: 80)
-                            .compatibleGlassEffect()
+                            .universalGlassEffect()
                             .universalGlassEffectUnion(id: "star and moon", namespace: namespace)
                         
                     }
@@ -311,13 +311,13 @@ private struct GlassEffectUnionPreview: View {
                     Image(systemName: "sparkle")
                         .font(.title)
                         .frame(width: 80, height: 80)
-                        .compatibleGlassEffect()
+                        .universalGlassEffect()
                     
                     if showMoon {
                         Image(systemName: "cloud")
                             .font(.title)
                             .frame(width: 80, height: 80)
-                            .compatibleGlassEffect()
+                            .universalGlassEffect()
                             .universalGlassEffectTransition(.matchedGeometry)
                             .universalGlassEffectUnion(id: "star2 and moon", namespace: namespace)
                     }
@@ -326,7 +326,7 @@ private struct GlassEffectUnionPreview: View {
                         Image(systemName: "sunglasses")
                             .font(.title)
                             .frame(width: 80, height: 80)
-                            .compatibleGlassEffect()
+                            .universalGlassEffect()
                             .universalGlassEffectTransition(.matchedGeometry)
                             .universalGlassEffectUnion(id: "star2 and moon", namespace: namespace)
                     }
@@ -344,14 +344,14 @@ private struct GlassEffectUnionPreview: View {
                         Image(systemName: "moon")
                             .font(.title)
                             .frame(width: 80, height: 80)
-                            .compatibleGlassEffect(rendering: .material)
+                            .universalGlassEffect(rendering: .material)
                             .universalGlassEffectTransition(.matchedGeometry)
                             .universalGlassEffectUnion(id: "star and moon", namespace: namespace, rendering: .material)
                     }
                         Image(systemName: "star")
                             .font(.title)
                             .frame(width: 80, height: 80)
-                            .compatibleGlassEffect(rendering: .material)
+                            .universalGlassEffect(rendering: .material)
                             .universalGlassEffectUnion(id: "star and moon", namespace: namespace, rendering: .material)
                         
                     }
@@ -359,13 +359,13 @@ private struct GlassEffectUnionPreview: View {
                     Image(systemName: "sparkle")
                         .font(.title)
                         .frame(width: 80, height: 80)
-                        .compatibleGlassEffect()
+                        .universalGlassEffect()
                     
                     if showMoon {
                         Image(systemName: "cloud")
                             .font(.title)
                             .frame(width: 80, height: 80)
-                            .compatibleGlassEffect(rendering: .material)
+                            .universalGlassEffect(rendering: .material)
                             .universalGlassEffectTransition(.matchedGeometry)
                             .universalGlassEffectUnion(id: "star2 and moon", namespace: namespace, rendering: .material)
                     }
@@ -374,7 +374,7 @@ private struct GlassEffectUnionPreview: View {
                         Image(systemName: "sunglasses")
                             .font(.title)
                             .frame(width: 80, height: 80)
-                            .compatibleGlassEffect(rendering: .material)
+                            .universalGlassEffect(rendering: .material)
                             .universalGlassEffectTransition(.matchedGeometry)
                             .universalGlassEffectUnion(id: "star2 and moon", namespace: namespace, rendering: .material)
                     }
@@ -402,7 +402,7 @@ private struct GlassEffectUnionPreview: View {
                         showMoon.toggle()
                     }
                 }
-                .compatibleGlassButtonStyle()
+                .universalGlassButtonStyle()
             }
         }
         .background(
@@ -439,7 +439,7 @@ private struct GlassEffectTransitionPreview: View {
                             .foregroundStyle(.secondary)
                     }
                     .padding(24)
-                    .compatibleGlassEffect()
+                    .universalGlassEffect()
                     .universalGlassEffectTransition(.materialize)
                 }
 
@@ -452,7 +452,7 @@ private struct GlassEffectTransitionPreview: View {
                             .foregroundStyle(.secondary)
                     }
                     .padding(24)
-                    .compatibleGlassEffect()
+                    .universalGlassEffect()
                     .universalGlassEffectTransition(.matchedGeometry)
                 }
 
@@ -465,7 +465,7 @@ private struct GlassEffectTransitionPreview: View {
                             .foregroundStyle(.secondary)
                     }
                     .padding(24)
-                    .compatibleGlassEffect()
+                    .universalGlassEffect()
                     .universalGlassEffectTransition(.identity)
                 }
             }
@@ -479,21 +479,21 @@ private struct GlassEffectTransitionPreview: View {
                         showMaterialize.toggle()
                     }
                 }
-                .compatibleGlassButtonStyle()
+                .universalGlassButtonStyle()
 
                 Button(showGeometry ? "Hide Matched" : "Show Matched") {
                     withAnimation(.spring(duration: 0.45)) {
                         showGeometry.toggle()
                     }
                 }
-                .compatibleGlassButtonStyle()
+                .universalGlassButtonStyle()
 
                 Button(showIdentity ? "Hide Identity" : "Show Identity") {
                     withAnimation(.spring(duration: 0.45)) {
                         showIdentity.toggle()
                     }
                 }
-                .compatibleGlassButtonStyle()
+                .universalGlassButtonStyle()
             }
         }
         .background(

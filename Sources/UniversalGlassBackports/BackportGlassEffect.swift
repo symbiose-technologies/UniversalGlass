@@ -11,22 +11,22 @@ import UniversalGlass
 @available(watchOS, introduced: 11.0, obsoleted: 26.0)
 public extension View {
     func glassEffect() -> some View {
-        compatibleGlassEffect()
+        universalGlassEffect()
     }
 
     func glassEffect<S: Shape>(in shape: S) -> some View {
-        compatibleGlassEffect(in: shape)
+        universalGlassEffect(in: shape)
     }
 
-    func glassEffect(_ glass: CompatibleGlass) -> some View {
-        compatibleGlassEffect(glass)
+    func glassEffect(_ glass: UniversalGlass) -> some View {
+        universalGlassEffect(glass)
     }
 
     func glassEffect<S: Shape>(
-        _ glass: CompatibleGlass,
+        _ glass: UniversalGlass,
         in shape: S
     ) -> some View {
-        compatibleGlassEffect(glass, in: shape)
+        universalGlassEffect(glass, in: shape)
     }
 }
 

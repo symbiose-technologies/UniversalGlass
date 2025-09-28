@@ -9,9 +9,9 @@ import UniversalGlass
 @available(macCatalyst, introduced: 13.0, obsoleted: 26.0)
 @available(tvOS, introduced: 18.0, obsoleted: 26.0)
 @available(watchOS, introduced: 11.0, obsoleted: 26.0)
-public extension PrimitiveButtonStyle where Self == CompatibleGlassButtonStyle {
-    static var glass: CompatibleGlassButtonStyle {
-        CompatibleGlassButtonStyle()
+public extension PrimitiveButtonStyle where Self == UniversalGlassButtonStyle {
+    static var glass: UniversalGlassButtonStyle {
+        UniversalGlassButtonStyle()
     }
 }
 
@@ -20,9 +20,9 @@ public extension PrimitiveButtonStyle where Self == CompatibleGlassButtonStyle {
 @available(macCatalyst, introduced: 13.0, obsoleted: 26.0)
 @available(tvOS, introduced: 18.0, obsoleted: 26.0)
 @available(watchOS, introduced: 11.0, obsoleted: 26.0)
-public extension PrimitiveButtonStyle where Self == CompatibleGlassProminentButtonStyle {
-    static var glassProminent: CompatibleGlassProminentButtonStyle {
-        CompatibleGlassProminentButtonStyle()
+public extension PrimitiveButtonStyle where Self == UniversalGlassProminentButtonStyle {
+    static var glassProminent: UniversalGlassProminentButtonStyle {
+        UniversalGlassProminentButtonStyle()
     }
 }
 

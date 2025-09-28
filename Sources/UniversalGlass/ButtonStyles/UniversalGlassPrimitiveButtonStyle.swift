@@ -2,7 +2,7 @@ import SwiftUI
 
 // MARK: - Primitive Button Styles
 
-public struct CompatibleGlassButtonStyle: PrimitiveButtonStyle {
+public struct UniversalGlassButtonStyle: PrimitiveButtonStyle {
     public typealias Body = AnyView
 
     private let rendering: UniversalGlassRendering
@@ -33,13 +33,13 @@ public struct CompatibleGlassButtonStyle: PrimitiveButtonStyle {
     @ViewBuilder
     private func fallbackBody(
         configuration: Configuration,
-        variant: CompatibleGlassLegacyVariant
+        variant: UniversalGlassLegacyVariant
     ) -> some View {
         Button(action: configuration.trigger) {
             configuration.label
         }
         .buttonStyle(
-            CompatibleGlassLegacyMaterialStyle(
+            UniversalGlassLegacyMaterialStyle(
                 rendering: rendering,
                 variant: variant
             )
@@ -51,7 +51,7 @@ public struct CompatibleGlassButtonStyle: PrimitiveButtonStyle {
     }
 }
 
-public struct CompatibleGlassProminentButtonStyle: PrimitiveButtonStyle {
+public struct UniversalGlassProminentButtonStyle: PrimitiveButtonStyle {
     public typealias Body = AnyView
 
     private let rendering: UniversalGlassRendering
@@ -82,13 +82,13 @@ public struct CompatibleGlassProminentButtonStyle: PrimitiveButtonStyle {
     @ViewBuilder
     private func fallbackBody(
         configuration: Configuration,
-        variant: CompatibleGlassLegacyVariant
+        variant: UniversalGlassLegacyVariant
     ) -> some View {
         Button(action: configuration.trigger) {
             configuration.label
         }
         .buttonStyle(
-            CompatibleGlassLegacyMaterialStyle(
+            UniversalGlassLegacyMaterialStyle(
                 rendering: rendering,
                 variant: variant
             )

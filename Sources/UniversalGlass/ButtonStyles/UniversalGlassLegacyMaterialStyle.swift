@@ -2,17 +2,17 @@ import SwiftUI
 
 // MARK: - Legacy Fallback Rendering
 
-enum CompatibleGlassLegacyVariant {
+enum UniversalGlassLegacyVariant {
     case standard
     case prominent
 }
 
-struct CompatibleGlassLegacyMaterialStyle: ButtonStyle {
+struct UniversalGlassLegacyMaterialStyle: ButtonStyle {
     let rendering: UniversalGlassRendering
-    let variant: CompatibleGlassLegacyVariant
+    let variant: UniversalGlassLegacyVariant
 
     func makeBody(configuration: Configuration) -> some View {
-        CompatibleGlassLegacyMaterialBody(
+        UniversalGlassLegacyMaterialBody(
             configuration: configuration,
             rendering: rendering,
             variant: variant
@@ -20,10 +20,10 @@ struct CompatibleGlassLegacyMaterialStyle: ButtonStyle {
     }
 }
 
-private struct CompatibleGlassLegacyMaterialBody: View {
+private struct UniversalGlassLegacyMaterialBody: View {
     let configuration: ButtonStyle.Configuration
     let rendering: UniversalGlassRendering
-    let variant: CompatibleGlassLegacyVariant
+    let variant: UniversalGlassLegacyVariant
 
     @Environment(\.controlSize) private var controlSize
     @Environment(\.isEnabled) private var isEnabled
@@ -87,7 +87,7 @@ private struct CompatibleGlassLegacyMaterialBody: View {
     private var background: some View {
         ZStack {
             Color.clear
-                .compatibleGlassEffect(backgroundGlass, in: Capsule(), rendering: fallbackRendering)
+                .universalGlassEffect(backgroundGlass, in: Capsule(), rendering: fallbackRendering)
 
             if variant == .prominent {
                 Capsule()
@@ -101,8 +101,8 @@ private struct CompatibleGlassLegacyMaterialBody: View {
         }
     }
 
-    private var backgroundGlass: CompatibleGlass {
-        let glass: CompatibleGlass
+    private var backgroundGlass: UniversalGlass {
+        let glass: UniversalGlass
 
         switch variant {
         case .standard:

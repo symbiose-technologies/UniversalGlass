@@ -51,7 +51,7 @@ public enum GlassEffectTransitionBackport: Sendable {
     case matchedGeometry
     case identity
 
-    fileprivate var compatibleValue: UniversalGlassEffectTransition {
+    fileprivate var universalValue: UniversalGlassEffectTransition {
         switch self {
         case .materialize: return .materialize
         case .matchedGeometry: return .matchedGeometry
@@ -77,6 +77,6 @@ public extension View {
     func glassEffectTransition(
         _ transition: GlassEffectTransition
     ) -> some View {
-        universalGlassEffectTransition(transition.compatibleValue)
+        universalGlassEffectTransition(transition.universalValue)
     }
 }

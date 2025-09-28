@@ -1,12 +1,12 @@
 import SwiftUI
 
 #if DEBUG
-#Preview("Modifier: compatibleGlassEffect") {
+#Preview("Modifier: universalGlassEffect") {
     Text("Glass Effect")
         .font(.title3.weight(.semibold))
         .padding(.horizontal, 36)
         .padding(.vertical, 16)
-        .compatibleGlassEffect()
+        .universalGlassEffect()
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(
             LinearGradient(
@@ -20,11 +20,11 @@ import SwiftUI
         )
 }
 
-#Preview("Modifier: compatibleGlassEffect (Shape)") {
+#Preview("Modifier: universalGlassEffect (Shape)") {
     Text("Custom Shape")
         .font(.title3.weight(.semibold))
         .padding(28)
-        .compatibleGlassEffect(
+        .universalGlassEffect(
             in: RoundedRectangle(cornerRadius: 28, style: .continuous)
         )
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -40,12 +40,12 @@ import SwiftUI
         )
 }
 
-#Preview("Modifier: compatibleGlassEffect (Custom Glass)") {
+#Preview("Modifier: universalGlassEffect (Custom Glass)") {
     Text("Tinted Regular Glass")
         .font(.title3.weight(.semibold))
         .padding(.horizontal, 36)
         .padding(.vertical, 16)
-        .compatibleGlassEffect(.regular.tint(.cyan))
+        .universalGlassEffect(.regular.tint(.cyan))
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(
             LinearGradient(
@@ -59,11 +59,11 @@ import SwiftUI
         )
 }
 
-#Preview("Modifier: compatibleGlassEffect (Glass + Shape)") {
+#Preview("Modifier: universalGlassEffect (Glass + Shape)") {
     Text("Clear Capsule")
         .font(.title3.weight(.semibold))
         .padding(28)
-        .compatibleGlassEffect(
+        .universalGlassEffect(
             .clear,
             in: Capsule()
         )
@@ -80,11 +80,11 @@ import SwiftUI
         )
 }
 
-#Preview("Modifier: compatibleGlassEffect (Glass + Interactive)") {
+#Preview("Modifier: universalGlassEffect (Glass + Interactive)") {
     Text("Clear Interactive")
         .font(.title3.weight(.semibold))
         .padding(28)
-        .compatibleGlassEffect(
+        .universalGlassEffect(
             .clear.interactive()
         )
         .frame(maxWidth: .infinity, maxHeight: .infinity)

@@ -28,8 +28,8 @@ OS 26 introduces new SwiftUI glass APIs, but these only ship on the latest platf
 
 ## Highlights
 
-- **Glass for every surface** – Apply `compatibleGlassEffect` to any view, shape, or custom `CompatibleGlass` configuration. Liquid accents, tinting, and interactivity
-- **Buttons that feel native** – `.compatibleGlass()` and `.compatibleGlassProminent()` mirror the future SwiftUI button styles, including a custom material fallback that respects tint, control size, and press animations
+- **Glass for every surface** – Apply `universalGlassEffect` to any view, shape, or custom `UniversalGlass` configuration. Liquid accents, tinting, and interactivity
+- **Buttons that feel native** – `.universalGlass()` and `.universalGlassProminent()` mirror the future SwiftUI button styles, including a custom material fallback that respects tint, control size, and press animations
 - **Containers & morphing** – Drop content into `UniversalGlassEffectContainer` and use union/ID helpers to bridge to SwiftUI’s morphing APIs
 - **Backports when you want them** – Import the optional `UniversalGlassBackports` target to get `.glass`, `.glassProminent`, and `.glassEffect`. They’re convenience shims that forward to the true SwiftUI APIs on iOS 26.
 - **Modular design** – Glass effects, button styles, transitions, and previews live in focused files
@@ -77,7 +77,7 @@ struct Card: View {
             .font(.headline)
             .padding(.horizontal, 36)
             .padding(.vertical, 18)
-            .compatibleGlassEffect(.regular.tint(.purple))
+            .universalGlassEffect(.regular.tint(.purple))
             .padding()
             .background(
                 LinearGradient(
@@ -95,7 +95,7 @@ Need a custom shape?
 ```swift
 Circle()
     .frame(width: 120, height: 120)
-    .compatibleGlassEffect(in: Circle())
+    .universalGlassEffect(in: Circle())
 ```
 
 ### Glass Button Styles
@@ -107,7 +107,7 @@ Button("Join Beta") {
 .tint(.pink)
 .controlSize(.large)
 .buttonStyle(
-    .compatibleGlassProminent()
+    .universalGlassProminent()
 )
 ```
 
@@ -121,11 +121,11 @@ Legacy fallbacks apply a capsule material with tint-aware highlights, drop shado
 UniversalGlassEffectContainer(spacing: 24) {
     HStack(spacing: 16) {
         AvatarView()
-            .compatibleGlassEffect()
+            .universalGlassEffect()
             .universalGlassEffectUnion(id: "profile", namespace: glassNamespace)
 
         DetailsView()
-            .compatibleGlassEffect()
+            .universalGlassEffect()
             .universalGlassEffectTransition(.matchedGeometry)
     }
 }
@@ -145,7 +145,7 @@ VStack {
     }
 
     Toggle("Show Settings", isOn: $showSettings)
-        .compatibleGlassButtonStyle()
+        .universalGlassButtonStyle()
 }
 .animation(.easeInOut(duration: 0.3), value: showSettings)
 ```
