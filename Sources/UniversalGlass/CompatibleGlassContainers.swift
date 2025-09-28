@@ -149,11 +149,20 @@ private struct GlassEffectContainerRenderer<Content: View>: View {
                 .environment(\.glassEffectParticipantContext, GlassEffectParticipantContext())
                 .environment(\.isInCompatibleGlassContainer, true)
         }
+        .mask({
+            Color.red
+                .overlayPreferenceValue(GlassEffectParticipantsKey.self) { participants in
+                    GeometryReader { proxy in
+                        GlassEffectFallbackOverlay(participants: participants, proxy: proxy)
+                    }
+                }
+        })
         .backgroundPreferenceValue(GlassEffectParticipantsKey.self) { participants in
             GeometryReader { proxy in
                 GlassEffectFallbackOverlay(participants: participants, proxy: proxy)
             }
         }
+       
     }
 }
 
@@ -242,7 +251,6 @@ private struct GlassEffectFallbackOverlay: View {
                 }
             }
         }
-        .animation(.easeInOut(duration: 0.25), value: orderedKeys.count)
         .allowsHitTesting(false)
     }
 }
@@ -306,12 +314,7 @@ private struct GlassEffectUnionPreview: View {
             CompatibleGlassEffectContainer() {
                 VStack(spacing: 20) {
                     VStack(spacing: 0) {
-                        Image(systemName: "star")
-                            .font(.title)
-                            .frame(width: 80, height: 80)
-                            .compatibleGlassEffect()
-                            .compatibleGlassEffectUnion(id: "star and moon", namespace: namespace)
-
+                        
                         if showMoon {
                             Image(systemName: "moon")
                                 .font(.title)
@@ -320,6 +323,11 @@ private struct GlassEffectUnionPreview: View {
                                 .compatibleGlassEffectTransition(.matchedGeometry)
                                 .compatibleGlassEffectUnion(id: "star and moon", namespace: namespace)
                         }
+                        Image(systemName: "star")
+                            .font(.title)
+                            .frame(width: 80, height: 80)
+                            .compatibleGlassEffect()
+                            .compatibleGlassEffectUnion(id: "star and moon", namespace: namespace)
                         
                     }
 
@@ -348,24 +356,26 @@ private struct GlassEffectUnionPreview: View {
                     
                 }
             }
+            .frame(maxWidth: .infinity)
             
             CompatibleGlassEffectContainer(rendering: .forceMaterial) {
                 VStack(spacing: 20) {
                     VStack(spacing: 0) {
+                        
+
+                    if showMoon {
+                        Image(systemName: "moon")
+                            .font(.title)
+                            .frame(width: 80, height: 80)
+                            .compatibleGlassEffect(rendering: .forceMaterial)
+                            .compatibleGlassEffectTransition(.matchedGeometry)
+                            .compatibleGlassEffectUnion(id: "star and moon", namespace: namespace, rendering: .forceMaterial)
+                    }
                         Image(systemName: "star")
                             .font(.title)
                             .frame(width: 80, height: 80)
                             .compatibleGlassEffect(rendering: .forceMaterial)
                             .compatibleGlassEffectUnion(id: "star and moon", namespace: namespace, rendering: .forceMaterial)
-
-                        if showMoon {
-                            Image(systemName: "moon")
-                                .font(.title)
-                                .frame(width: 80, height: 80)
-                                .compatibleGlassEffect(rendering: .forceMaterial)
-                                .compatibleGlassEffectTransition(.matchedGeometry)
-                                .compatibleGlassEffectUnion(id: "star and moon", namespace: namespace, rendering: .forceMaterial)
-                        }
                         
                     }
 
@@ -393,9 +403,9 @@ private struct GlassEffectUnionPreview: View {
                     }
                     
                 }
-            }
+            }.frame(maxWidth: .infinity)
         }
-        .padding()
+        .padding(.horizontal, 60)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .safeAreaInset(edge: .bottom) {
             VStack(spacing: 12) {

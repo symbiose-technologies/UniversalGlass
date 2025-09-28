@@ -232,6 +232,7 @@ private struct CompatibleGlassEffectModifier: ViewModifier {
             ? AnyView(content.modifier(CompatibleGlassFallbackBackground(material: material, shape: targetShape)))
             : AnyView(content)
         return base
+            .transition(.blur)
             .anchorPreference(key: GlassEffectParticipantsKey.self, value: .bounds) { anchor in
                 [GlassEffectParticipant(
                     id: UUID(),
