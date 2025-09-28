@@ -64,6 +64,40 @@ public extension View {
     }
 }
 
+// MARK: - Compatible Glass Effect Transition
+
+public enum CompatibleGlassEffectTransition {
+    case materialize
+    case matchedGeometry
+    case identity
+}
+
+public extension View {
+
+    /// Applies a glass effect transition with backward compatibility
+    @ViewBuilder
+    func compatibleGlassEffectTransition(
+        _ transition: CompatibleGlassEffectTransition
+    ) -> some View {
+        if #available(iOS 26.0, macOS 26.0, *) {
+            switch transition {
+            case .materialize:
+                self.glassEffectTransition(.materialize)
+            case .matchedGeometry:
+                if #available(iOS 26.1, macOS 26.1, *) {
+                    self.glassEffectTransition(.matchedGeometry)
+                } else {
+                    self
+                }
+            case .identity:
+                self.glassEffectTransition(.identity)
+            }
+        } else {
+            self
+        }
+    }
+}
+
 #if DEBUG
 
 #Preview("Container: CompatibleGlassEffectContainer") {
@@ -185,5 +219,90 @@ public extension View {
         .compatibleGlassProminentButtonStyle(rendering: .automatic)
     }
     .padding()
+}
+
+#Preview("Modifier: compatibleGlassEffectTransition") {
+    @Previewable @State var showMaterialize = true
+    @Previewable @State var showGeometry = true
+    @Previewable @State var showIdentity = true
+
+    return CompatibleGlassEffectContainer(spacing: 18, rendering: .automatic) {
+        VStack(spacing: 20) {
+            if showMaterialize {
+                VStack(spacing: 12) {
+                    Text("Materialize Transition")
+                        .font(.headline)
+                    Text("Glass enters with liquid morphing.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                .padding(24)
+                .compatibleGlassEffect(rendering: .automatic)
+                .compatibleGlassEffectTransition(.materialize)
+            }
+
+            if showGeometry {
+                VStack(spacing: 12) {
+                    Text("Matched Geometry Transition")
+                        .font(.headline)
+                    Text("Shares movement with surrounding layout.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                .padding(24)
+                .compatibleGlassEffect(rendering: .automatic)
+                .compatibleGlassEffectTransition(.matchedGeometry)
+            }
+
+            if showIdentity {
+                VStack(spacing: 12) {
+                    Text("Identity Transition")
+                        .font(.headline)
+                    Text("Appears without morphing animation.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                .padding(24)
+                .compatibleGlassEffect(rendering: .automatic)
+                .compatibleGlassEffectTransition(.identity)
+            }
+        }
+    }
+    .padding()
+    .frame(maxWidth: .infinity, maxHeight: .infinity)
+    .safeAreaInset(edge: .bottom) {
+        VStack(spacing: 12) {
+            Button(showMaterialize ? "Hide Materialize" : "Show Materialize") {
+                withAnimation(.spring(duration: 0.45)) {
+                    showMaterialize.toggle()
+                }
+            }
+            .compatibleGlassButtonStyle(rendering: .automatic)
+
+            Button(showGeometry ? "Hide Matched" : "Show Matched") {
+                withAnimation(.spring(duration: 0.45)) {
+                    showGeometry.toggle()
+                }
+            }
+            .compatibleGlassButtonStyle(rendering: .automatic)
+
+            Button(showIdentity ? "Hide Identity" : "Show Identity") {
+                withAnimation(.spring(duration: 0.45)) {
+                    showIdentity.toggle()
+                }
+            }
+            .compatibleGlassButtonStyle(rendering: .automatic)
+        }
+    }
+    .background(
+        LinearGradient(
+            colors: [
+                Color(red: 0.15, green: 0.08, blue: 0.32),
+                Color(red: 0.40, green: 0.10, blue: 0.36)
+            ],
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        )
+    )
 }
 #endif
