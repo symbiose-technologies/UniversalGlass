@@ -36,7 +36,7 @@ public extension View {
         Text("Standard Glass")
             .padding(.horizontal, 36)
             .padding(.vertical, 16)
-            .glassEffect()
+            .glassEffect(.regular.interactive())
 
         Text("Custom Shape")
             .padding(.horizontal, 36)

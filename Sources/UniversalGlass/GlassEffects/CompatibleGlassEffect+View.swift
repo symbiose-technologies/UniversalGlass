@@ -77,61 +77,138 @@ struct GlassEffectParticipantsKey: PreferenceKey {
 public extension View {
     /// Applies a glass effect with backward compatibility to Material on older versions.
     /// - Parameter rendering: Controls whether glass or material rendering is enforced.
+    @ViewBuilder
     func compatibleGlassEffect(rendering: CompatibleGlassRendering = .automatic) -> some View {
-        modifier(
-            CompatibleGlassEffectModifier(
+        if #available(iOS 26.0, macOS 26.0, *) {
+            switch rendering {
+            case .forceMaterial:
+                applyingCompatibleGlassFallback(
+                    fallbackMaterial: .regularMaterial,
+                    glassConfiguration: nil,
+                    shape: nil,
+                    rendering: rendering
+                )
+            case .automatic, .forceGlass:
+                self.glassEffect()
+            }
+        } else {
+            applyingCompatibleGlassFallback(
                 fallbackMaterial: .regularMaterial,
                 glassConfiguration: nil,
                 shape: nil,
                 rendering: rendering
             )
-        )
+        }
     }
 
     /// Applies a glass effect with custom shape and backward compatibility.
     /// - Parameter rendering: Controls whether glass or material rendering is enforced.
+    @ViewBuilder
     func compatibleGlassEffect<S: Shape>(
         in shape: S,
         rendering: CompatibleGlassRendering = .automatic
     ) -> some View {
-        modifier(
-            CompatibleGlassEffectModifier(
+        if #available(iOS 26.0, macOS 26.0, *) {
+            switch rendering {
+            case .forceMaterial:
+                applyingCompatibleGlassFallback(
+                    fallbackMaterial: .regularMaterial,
+                    glassConfiguration: nil,
+                    shape: AnyGlassShape(shape),
+                    rendering: rendering
+                )
+            case .automatic, .forceGlass:
+                self.glassEffect(in: shape)
+            }
+        } else {
+            applyingCompatibleGlassFallback(
                 fallbackMaterial: .regularMaterial,
                 glassConfiguration: nil,
                 shape: AnyGlassShape(shape),
                 rendering: rendering
             )
-        )
+        }
     }
 
     /// Applies a glass effect with custom glass configuration and backward compatibility.
     /// - Parameter rendering: Controls whether glass or material rendering is enforced.
+    @ViewBuilder
     func compatibleGlassEffect(
         _ glass: CompatibleGlass,
         rendering: CompatibleGlassRendering = .automatic
     ) -> some View {
-        modifier(
-            CompatibleGlassEffectModifier(
+        if #available(iOS 26.0, macOS 26.0, *) {
+            switch rendering {
+            case .forceMaterial:
+                applyingCompatibleGlassFallback(
+                    fallbackMaterial: glass.fallbackMaterial,
+                    glassConfiguration: glass,
+                    shape: nil,
+                    rendering: rendering
+                )
+            case .automatic, .forceGlass:
+                if let actualGlass = glass.liquidGlass {
+                    self.glassEffect(actualGlass)
+                } else {
+                    self.glassEffect()
+                }
+            }
+        } else {
+            applyingCompatibleGlassFallback(
                 fallbackMaterial: glass.fallbackMaterial,
                 glassConfiguration: glass,
                 shape: nil,
                 rendering: rendering
             )
-        )
+        }
     }
 
-    /// Applies a glass effect with custom glass configuration and shape.
-    /// - Parameter rendering: Controls whether glass or material rendering is enforced.
+    /// Applies a glass effect with custom glass configuration and shape with backward compatibility.
+    @ViewBuilder
     func compatibleGlassEffect<S: Shape>(
         _ glass: CompatibleGlass,
         in shape: S,
         rendering: CompatibleGlassRendering = .automatic
     ) -> some View {
-        modifier(
-            CompatibleGlassEffectModifier(
+        if #available(iOS 26.0, macOS 26.0, *) {
+            switch rendering {
+            case .forceMaterial:
+                applyingCompatibleGlassFallback(
+                    fallbackMaterial: glass.fallbackMaterial,
+                    glassConfiguration: glass,
+                    shape: AnyGlassShape(shape),
+                    rendering: rendering
+                )
+            case .automatic, .forceGlass:
+                if let actualGlass = glass.liquidGlass {
+                    self.glassEffect(actualGlass, in: shape)
+                } else {
+                    self.glassEffect(in: shape)
+                }
+            }
+        } else {
+            applyingCompatibleGlassFallback(
                 fallbackMaterial: glass.fallbackMaterial,
                 glassConfiguration: glass,
                 shape: AnyGlassShape(shape),
+                rendering: rendering
+            )
+        }
+    }
+}
+
+private extension View {
+    func applyingCompatibleGlassFallback(
+        fallbackMaterial: Material,
+        glassConfiguration: CompatibleGlass?,
+        shape: AnyGlassShape?,
+        rendering: CompatibleGlassRendering
+    ) -> some View {
+        modifier(
+            CompatibleGlassEffectModifier(
+                fallbackMaterial: fallbackMaterial,
+                glassConfiguration: glassConfiguration,
+                shape: shape,
                 rendering: rendering
             )
         )

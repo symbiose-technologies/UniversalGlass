@@ -12,7 +12,11 @@ public func CompatibleGlassEffectContainer<Content: View>(
     if #available(iOS 26.0, macOS 26.0, *) {
         switch rendering {
         case .forceMaterial:
-            content()
+            CompatibleGlassEffectContainerFallback(
+                spacing: spacing,
+                rendering: rendering,
+                content: content
+            )
         case .automatic, .forceGlass:
             GlassEffectContainer(spacing: spacing, content: content)
         }
@@ -40,17 +44,16 @@ public extension View {
             switch rendering {
             case .forceMaterial:
                 self
+                    .transformEnvironment(\.glassEffectParticipantContext) { context in
+                        context.union = GlassEffectUnion(id: AnyHashable(id), namespace: namespace)
+                    }
             case .automatic, .forceGlass:
                 self.glassEffectUnion(id: id, namespace: namespace)
             }
         } else {
-            switch rendering {
-            case .forceMaterial:
-                self
-            case .automatic, .forceGlass:
-                self.transformEnvironment(\.glassEffectParticipantContext) { context in
-                    context.union = GlassEffectUnion(id: AnyHashable(id), namespace: namespace)
-                }
+            self
+                .transformEnvironment(\.glassEffectParticipantContext) { context in
+                context.union = GlassEffectUnion(id: AnyHashable(id), namespace: namespace)
             }
         }
     }
@@ -295,49 +298,97 @@ private struct GlassEffectUnionPreview: View {
     @State private var showMoon = true
 
     var body: some View {
-        CompatibleGlassEffectContainer() {
-            VStack(spacing: 20) {
-                VStack(spacing: 0) {
-                    Image(systemName: "star")
+        HStack(spacing: 30){
+            CompatibleGlassEffectContainer() {
+                VStack(spacing: 20) {
+                    VStack(spacing: 0) {
+                        Image(systemName: "star")
+                            .font(.title)
+                            .frame(width: 80, height: 80)
+                            .compatibleGlassEffect()
+                            .compatibleGlassEffectUnion(id: "star and moon", namespace: namespace)
+
+                        if showMoon {
+                            Image(systemName: "moon")
+                                .font(.title)
+                                .frame(width: 80, height: 80)
+                                .compatibleGlassEffect()
+                                .compatibleGlassEffectTransition(.matchedGeometry)
+                                .compatibleGlassEffectUnion(id: "star and moon", namespace: namespace)
+                        }
+                        
+                    }
+
+                    Image(systemName: "sparkle")
                         .font(.title)
                         .frame(width: 80, height: 80)
                         .compatibleGlassEffect()
-                        .compatibleGlassEffectUnion(id: "star and moon", namespace: namespace)
-
+                    
                     if showMoon {
                         Image(systemName: "moon")
                             .font(.title)
                             .frame(width: 80, height: 80)
                             .compatibleGlassEffect()
                             .compatibleGlassEffectTransition(.matchedGeometry)
-                            .compatibleGlassEffectUnion(id: "star and moon", namespace: namespace)
+                            .compatibleGlassEffectUnion(id: "star2 and moon", namespace: namespace)
+                    }
+                    
+                    if showMoon {
+                        Image(systemName: "moon")
+                            .font(.title)
+                            .frame(width: 80, height: 80)
+                            .compatibleGlassEffect()
+                            .compatibleGlassEffectTransition(.matchedGeometry)
+                            .compatibleGlassEffectUnion(id: "star2 and moon", namespace: namespace)
                     }
                     
                 }
+            }
+            
+            CompatibleGlassEffectContainer(rendering: .forceMaterial) {
+                VStack(spacing: 20) {
+                    VStack(spacing: 0) {
+                        Image(systemName: "star")
+                            .font(.title)
+                            .frame(width: 80, height: 80)
+                            .compatibleGlassEffect(rendering: .forceMaterial)
+                            .compatibleGlassEffectUnion(id: "star and moon", namespace: namespace, rendering: .forceMaterial)
 
-                Image(systemName: "sparkle")
-                    .font(.title)
-                    .frame(width: 80, height: 80)
-                    .compatibleGlassEffect()
-                
-                if showMoon {
-                    Image(systemName: "moon")
+                        if showMoon {
+                            Image(systemName: "moon")
+                                .font(.title)
+                                .frame(width: 80, height: 80)
+                                .compatibleGlassEffect(rendering: .forceMaterial)
+                                .compatibleGlassEffectTransition(.matchedGeometry)
+                                .compatibleGlassEffectUnion(id: "star and moon", namespace: namespace, rendering: .forceMaterial)
+                        }
+                        
+                    }
+
+                    Image(systemName: "sparkle")
                         .font(.title)
                         .frame(width: 80, height: 80)
                         .compatibleGlassEffect()
-                        .compatibleGlassEffectTransition(.matchedGeometry)
-                        .compatibleGlassEffectUnion(id: "star2 and moon", namespace: namespace)
+                    
+                    if showMoon {
+                        Image(systemName: "moon")
+                            .font(.title)
+                            .frame(width: 80, height: 80)
+                            .compatibleGlassEffect(rendering: .forceMaterial)
+                            .compatibleGlassEffectTransition(.matchedGeometry)
+                            .compatibleGlassEffectUnion(id: "star2 and moon", namespace: namespace, rendering: .forceMaterial)
+                    }
+                    
+                    if showMoon {
+                        Image(systemName: "moon")
+                            .font(.title)
+                            .frame(width: 80, height: 80)
+                            .compatibleGlassEffect(rendering: .forceMaterial)
+                            .compatibleGlassEffectTransition(.matchedGeometry)
+                            .compatibleGlassEffectUnion(id: "star2 and moon", namespace: namespace, rendering: .forceMaterial)
+                    }
+                    
                 }
-                
-                if showMoon {
-                    Image(systemName: "moon")
-                        .font(.title)
-                        .frame(width: 80, height: 80)
-                        .compatibleGlassEffect()
-                        .compatibleGlassEffectTransition(.matchedGeometry)
-                        .compatibleGlassEffectUnion(id: "star2 and moon", namespace: namespace)
-                }
-                
             }
         }
         .padding()
