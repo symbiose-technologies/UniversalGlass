@@ -8,13 +8,11 @@ enum UniversalGlassLegacyVariant {
 }
 
 struct UniversalGlassLegacyMaterialStyle: ButtonStyle {
-    let rendering: UniversalGlassRendering
     let variant: UniversalGlassLegacyVariant
-
+    
     func makeBody(configuration: Configuration) -> some View {
         UniversalGlassLegacyMaterialBody(
             configuration: configuration,
-            rendering: rendering,
             variant: variant
         )
     }
@@ -22,14 +20,13 @@ struct UniversalGlassLegacyMaterialStyle: ButtonStyle {
 
 private struct UniversalGlassLegacyMaterialBody: View {
     let configuration: ButtonStyle.Configuration
-    let rendering: UniversalGlassRendering
     let variant: UniversalGlassLegacyVariant
-
+    
     @Environment(\.controlSize) private var controlSize
     @Environment(\.isEnabled) private var isEnabled
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
-
+    
     var body: some View {
         styledLabel
             .padding(padding)
@@ -41,7 +38,7 @@ private struct UniversalGlassLegacyMaterialBody: View {
             .scaleEffect(configuration.isPressed ? 0.97 : 1)
             .animation(animation, value: configuration.isPressed)
     }
-
+    
     @ViewBuilder
     private var styledLabel: some View {
         switch variant {
@@ -53,7 +50,7 @@ private struct UniversalGlassLegacyMaterialBody: View {
                 .foregroundStyle(Color.white.opacity(isEnabled ? 0.95 : 0.6))
         }
     }
-
+    
     private var padding: EdgeInsets {
         let metrics = metrics(for: controlSize)
         return EdgeInsets(
@@ -63,10 +60,10 @@ private struct UniversalGlassLegacyMaterialBody: View {
             trailing: metrics.horizontal
         )
     }
-
+    
     private func metrics(for controlSize: ControlSize) -> (horizontal: CGFloat, vertical: CGFloat) {
         let prominent = variant == .prominent
-
+        
         switch controlSize {
         case .mini:
             return prominent ? (12, 5) : (12, 5)
@@ -82,69 +79,92 @@ private struct UniversalGlassLegacyMaterialBody: View {
             return prominent ? (12, 7) : (12, 7)
         }
     }
-
+    
     @ViewBuilder
     private var background: some View {
         ZStack {
             Color.clear
-                .universalGlassEffect(backgroundGlass, in: Capsule(), rendering: fallbackRendering)
-
+                .universalGlassEffect(backgroundGlass, in: Capsule(), rendering: .material)
+            
             if variant == .prominent {
                 Capsule()
                     .fill(.tint)
                     .opacity(isEnabled ? 1.0 : 0.32)
             }
-
+            
             Capsule()
                 .strokeBorder(Color.white.opacity(0.4), lineWidth: borderWidth)
                 .opacity(borderOpacity)
         }
     }
-
+    
     private var backgroundGlass: UniversalGlass {
         let glass: UniversalGlass
-
+        
         switch variant {
         case .standard:
             glass = .clear
         case .prominent:
             glass = .regular
         }
-
+        
         return glass.interactive()
     }
-
-    private var fallbackRendering: UniversalGlassRendering {
-        if #available(iOS 26.0, macOS 26.0, *), case .material = rendering {
-            return .material
-        }
-
-        return .automatic
-    }
-
+    
     private var borderWidth: CGFloat {
         variant == .prominent ? 1.4 : 1
     }
-
+    
     private var borderOpacity: CGFloat {
         let base: CGFloat = variant == .prominent ? 0.7 : 0.5
         return base * (isEnabled ? 1 : 0.45)
     }
-
+    
     private var shadowColor: Color {
         let base: Double = variant == .prominent ? 0.1 : 0.02
         return Color.black.opacity(isEnabled ? base : base * 0.35)
     }
-
+    
     private var shadowRadius: CGFloat {
         variant == .prominent ? 14 : 10
     }
-
+    
     private var shadowYOffset: CGFloat {
         variant == .prominent ? 4 : 3
     }
-
+    
     private var animation: Animation? {
         reduceMotion ? nil : .easeInOut(duration: 0.12)
     }
 }
+
+#if DEBUG
+#Preview("Legacy Material Buttons") {
+    
+    VStack(spacing: 20) {
+        Button("UniversalGlassLegacyMaterialStyle Standard") { }
+            .tint(.pink)
+            .buttonStyle(
+                UniversalGlassLegacyMaterialStyle(
+                    variant: .standard
+                )
+            )
+            .controlSize(.large)
+        
+        Button("UniversalGlassLegacyMaterialStyle Prominent") { }
+            .tint(.pink)
+            .controlSize(.large)
+            .buttonStyle(
+                UniversalGlassLegacyMaterialStyle(
+                    variant: .prominent
+                )
+            )
+    }
+    .padding(32)
+    .frame(maxWidth: .infinity, maxHeight: .infinity)
+    .background(
+        LinearGradient(colors: [.pink.opacity(0.2), .purple.opacity(0.7)], startPoint: .topLeading, endPoint: .bottomTrailing)
+            .ignoresSafeArea()
+    )
+}
+#endif

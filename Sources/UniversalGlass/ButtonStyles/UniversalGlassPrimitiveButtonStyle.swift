@@ -4,19 +4,19 @@ import SwiftUI
 
 public struct UniversalGlassButtonStyle: PrimitiveButtonStyle {
     public typealias Body = AnyView
-
+    
     private let rendering: UniversalGlassRendering
-
+    
     public init(
         rendering: UniversalGlassRendering = .automatic
     ) {
         self.rendering = rendering
     }
-
+    
     public func makeBody(configuration: Configuration) -> AnyView {
         AnyView(resolvedBody(configuration: configuration))
     }
-
+    
     @ViewBuilder
     private func resolvedBody(configuration: Configuration) -> some View {
         if shouldUseGlass {
@@ -29,7 +29,7 @@ public struct UniversalGlassButtonStyle: PrimitiveButtonStyle {
             fallbackBody(configuration: configuration, variant: .standard)
         }
     }
-
+    
     @ViewBuilder
     private func fallbackBody(
         configuration: Configuration,
@@ -40,12 +40,11 @@ public struct UniversalGlassButtonStyle: PrimitiveButtonStyle {
         }
         .buttonStyle(
             UniversalGlassLegacyMaterialStyle(
-                rendering: rendering,
                 variant: variant
             )
         )
     }
-
+    
     private var shouldUseGlass: Bool {
         resolveShouldUseGlass(for: rendering)
     }
@@ -53,19 +52,19 @@ public struct UniversalGlassButtonStyle: PrimitiveButtonStyle {
 
 public struct UniversalGlassProminentButtonStyle: PrimitiveButtonStyle {
     public typealias Body = AnyView
-
+    
     private let rendering: UniversalGlassRendering
-
+    
     public init(
         rendering: UniversalGlassRendering = .automatic
     ) {
         self.rendering = rendering
     }
-
+    
     public func makeBody(configuration: Configuration) -> AnyView {
         AnyView(resolvedBody(configuration: configuration))
     }
-
+    
     @ViewBuilder
     private func resolvedBody(configuration: Configuration) -> some View {
         if shouldUseGlass {
@@ -78,7 +77,7 @@ public struct UniversalGlassProminentButtonStyle: PrimitiveButtonStyle {
             fallbackBody(configuration: configuration, variant: .prominent)
         }
     }
-
+    
     @ViewBuilder
     private func fallbackBody(
         configuration: Configuration,
@@ -89,12 +88,11 @@ public struct UniversalGlassProminentButtonStyle: PrimitiveButtonStyle {
         }
         .buttonStyle(
             UniversalGlassLegacyMaterialStyle(
-                rendering: rendering,
                 variant: variant
             )
         )
     }
-
+    
     private var shouldUseGlass: Bool {
         resolveShouldUseGlass(for: rendering)
     }
@@ -110,13 +108,47 @@ private func resolveShouldUseGlass(for rendering: UniversalGlassRendering) -> Bo
         if case .material = rendering {
             return false
         }
-
+        
         if case .glass = rendering {
             return true
         }
-
+        
         return true
     } else {
         return false
     }
 }
+
+#if DEBUG
+#Preview("Primitive Glass Buttons") {
+    
+    VStack(spacing: 24) {
+        
+        Button("Automatic") { }
+            .buttonStyle(.universalGlass())
+            .controlSize(.large)
+            .tint(.purple)
+        
+        Button("Material Forced") { }
+            .buttonStyle(.universalGlass(rendering: .material))
+            .controlSize(.large)
+            .tint(.purple)
+        
+        Button("Automatic Prominent") { }
+            .buttonStyle(.universalGlassProminent())
+            .controlSize(.large)
+            .tint(.purple)
+        
+        Button("Material Forced Prominent") {}
+            .buttonStyle(.universalGlassProminent(rendering: .material))
+            .controlSize(.large)
+            .tint(.purple)
+    }
+    .padding(32)
+    .frame(maxWidth: .infinity, maxHeight: .infinity)
+    .background(
+        LinearGradient(colors: [.purple.opacity(0.6), .red.opacity(0.4)], startPoint: .top, endPoint: .bottom)
+            .ignoresSafeArea()
+    )
+}
+#endif

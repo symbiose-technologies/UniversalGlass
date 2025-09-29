@@ -72,3 +72,43 @@ public extension AnyTransition {
             )
     }
 }
+
+#if DEBUG
+#Preview("AnyTransition.blur variations") {
+    @Previewable @State var showDetails = true
+
+    VStack(spacing: 20) {
+        Toggle("Show Details", isOn: $showDetails)
+            .toggleStyle(.switch)
+            .padding(.horizontal, 32)
+
+        Spacer()
+
+        if showDetails {
+            VStack(spacing: 12) {
+                Text("Liquid Glass")
+                    .font(.title3.weight(.semibold))
+                Text("Appears with blur and scale")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+            .padding(32)
+            .frame(maxWidth: .infinity)
+            .background(
+                RoundedRectangle(cornerRadius: 28, style: .continuous)
+                    .fill(.ultraThinMaterial)
+            )
+            .transition(.blurSmooth)
+        }
+
+        Spacer()
+    }
+    .animation(.spring(response: 0.45, dampingFraction: 0.8), value: showDetails)
+    .padding()
+    .frame(maxWidth: .infinity, maxHeight: .infinity)
+    .background(
+        LinearGradient(colors: [.indigo.opacity(0.7), .black], startPoint: .top, endPoint: .bottom)
+            .ignoresSafeArea()
+    )
+}
+#endif

@@ -134,3 +134,35 @@ public enum UniversalGlassRendering {
     /// Forces the material fallback even on platforms that support glass.
     case material
 }
+
+#if DEBUG
+#Preview("UniversalGlass presets") {
+    let glasses: [(title: String, configuration: UniversalGlass)] = [
+        ("Regular", .regular),
+        ("Clear + Tint", .clear.tint(.cyan)),
+        ("Ultrathin", .ultraThin),
+        ("Thin", .thin),
+        ("Regular", .regular),
+        ("Thick", .thick),
+        ("Interactive", .regular.interactive())
+    ]
+
+    return VStack(spacing: 24) {
+        ForEach(Array(glasses.enumerated()), id: \.offset) { entry in
+            Label(entry.element.title, systemImage: "sparkles")
+                .font(.headline)
+                .padding(.horizontal, 36)
+                .padding(.vertical, 16)
+                .universalGlassEffect(entry.element.configuration)
+        }
+    }
+    .frame(maxWidth: .infinity, maxHeight: .infinity)
+    .background(
+        LinearGradient(
+            colors: [Color(red: 0.05, green: 0.18, blue: 0.34), Color(red: 0.04, green: 0.32, blue: 0.44)],
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        ).ignoresSafeArea()
+    )
+}
+#endif

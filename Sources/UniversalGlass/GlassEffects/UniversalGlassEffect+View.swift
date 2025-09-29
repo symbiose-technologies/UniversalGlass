@@ -92,6 +92,8 @@ public extension View {
                 self.glassEffect()
             }
         } else {
+            // `.glass` is unavailable on these OS versions; both `.automatic` and `.material`
+            // deliberately route through the fallback modifier.
             applyingUniversalGlassFallback(
                 fallbackMaterial: .regularMaterial,
                 glassConfiguration: nil,
@@ -121,6 +123,8 @@ public extension View {
                 self.glassEffect(in: shape)
             }
         } else {
+            // Pre-iOS 26 the native glass APIs do not exist, so all render modes share
+            // the material fallback path for consistency.
             applyingUniversalGlassFallback(
                 fallbackMaterial: .regularMaterial,
                 glassConfiguration: nil,
@@ -154,6 +158,7 @@ public extension View {
                 }
             }
         } else {
+            // Fallback always draws material here because liquid glass is unavailable.
             applyingUniversalGlassFallback(
                 fallbackMaterial: glass.fallbackMaterial,
                 glassConfiguration: glass,
@@ -187,6 +192,7 @@ public extension View {
                 }
             }
         } else {
+            // Prior to iOS 26 we only have the material fallback, regardless of rendering mode.
             applyingUniversalGlassFallback(
                 fallbackMaterial: glass.fallbackMaterial,
                 glassConfiguration: glass,
@@ -266,3 +272,54 @@ private struct UniversalGlassFallbackBackground: ViewModifier {
         }
     }
 }
+
+#if DEBUG
+#Preview("Universal glass modifiers") {
+    @Previewable @Namespace var namespace
+    @Previewable @State var showDetail = true
+
+    UniversalGlassEffectContainer(rendering: .automatic) {
+        VStack(spacing: 24) {
+            HStack(spacing: 16) {
+                Image(systemName: "sparkles")
+                    .font(.title)
+                    .frame(width: 80, height: 80)
+                    .universalGlassEffect()
+                    .universalGlassEffectUnion(id: "cluster", namespace: namespace)
+
+                Image(systemName: "moon.stars")
+                    .font(.title)
+                    .frame(width: 80, height: 80)
+                    .universalGlassEffect(.regular.tint(.purple))
+                    .universalGlassEffectUnion(id: "cluster", namespace: namespace)
+            }
+
+            if showDetail {
+                Text("Matched geometry joins the icons into one glass slab on older OS versions.")
+                    .font(.caption)
+                    .multilineTextAlignment(.center)
+                    .padding(20)
+                    .universalGlassEffect(
+                        .clear.interactive(),
+                        in: RoundedRectangle(cornerRadius: 24, style: .continuous)
+                    )
+                    .universalGlassEffectTransition(.materialize)
+            }
+
+            Toggle("Show Details", isOn: $showDetail)
+                .toggleStyle(.switch)
+                .padding(.horizontal, 32)
+        }
+        .padding(24)
+    }
+    .animation(.spring(response: 0.45, dampingFraction: 0.8), value: showDetail)
+    .frame(maxWidth: .infinity, maxHeight: .infinity)
+    .background(
+        LinearGradient(
+            colors: [Color(red: 0.04, green: 0.10, blue: 0.28), Color(red: 0.10, green: 0.30, blue: 0.42)],
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        ).ignoresSafeArea()
+    )
+}
+#endif

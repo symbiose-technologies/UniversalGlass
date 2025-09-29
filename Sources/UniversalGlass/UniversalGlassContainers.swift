@@ -51,10 +51,12 @@ public extension View {
                 self.glassEffectUnion(id: id, namespace: namespace)
             }
         } else {
+            // `.glass` is not available before iOS 26, so `.automatic` and `.material`
+            // both update the fallback participant context.
             self
                 .transformEnvironment(\.glassEffectParticipantContext) { context in
-                context.union = GlassEffectUnion(id: AnyHashable(id), namespace: namespace)
-            }
+                    context.union = GlassEffectUnion(id: AnyHashable(id), namespace: namespace)
+                }
         }
     }
     
@@ -76,6 +78,8 @@ public extension View {
                 self.glassEffectID(id, in: namespace)
             }
         } else {
+            // Older OS versions rely entirely on the fallback container, so we always
+            // capture the identifiers in the participant context.
             self.transformEnvironment(\.glassEffectParticipantContext) { context in
                 context.effectID = AnyHashable(id)
                 context.union = GlassEffectUnion(id: AnyHashable(id), namespace: namespace)
