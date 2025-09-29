@@ -1,4 +1,26 @@
 import SwiftUI
+#if canImport(UIKit)
+import UIKit
+#endif
+
+// MARK: - Helpers
+
+private extension UniversalGlass {
+    static func systemBackgroundTint(opacity: Double) -> Color {
+        let base: Color
+        #if canImport(UIKit)
+        base = Color(UIColor.systemBackground)
+        #elseif canImport(AppKit) && !targetEnvironment(macCatalyst)
+        base = Color(NSColor.windowBackgroundColor)
+        #else
+        base = Color.white
+        #endif
+        return base.opacity(opacity)
+    }
+}
+#if canImport(AppKit) && !targetEnvironment(macCatalyst)
+import AppKit
+#endif
 
 // MARK: - Universal Glass Configuration
 
@@ -29,36 +51,54 @@ public struct UniversalGlass {
         }
     }()
 
-    /// Thick liquid glass effect with thick material fallback.
+    /// Thick liquid glass effect with thick material fallback and subtle background tint.
     nonisolated(unsafe) public static let thick: UniversalGlass = {
         if #available(iOS 26.0, macOS 26.0, *) {
+            let tint = systemBackgroundTint(opacity: 0.28)
+            let tintedGlass: Any = Glass.regular.tint(tint)
             return UniversalGlass(
                 fallbackMaterial: .thickMaterial,
-                liquidGlass: Glass.regular
+                liquidGlass: tintedGlass
             )
         } else {
             return UniversalGlass(fallbackMaterial: .thickMaterial)
         }
     }()
 
-    /// Thin liquid glass effect with thin material fallback.
+    /// Ultra thick liquid glass effect with ultra thick material fallback and stronger tinting.
+    nonisolated(unsafe) public static let ultraThick: UniversalGlass = {
+        if #available(iOS 26.0, macOS 26.0, *) {
+            let tint = systemBackgroundTint(opacity: 0.42)
+            let tintedGlass: Any = Glass.regular.tint(tint)
+            return UniversalGlass(
+                fallbackMaterial: .ultraThickMaterial,
+                liquidGlass: tintedGlass
+            )
+        } else {
+            return UniversalGlass(fallbackMaterial: .ultraThickMaterial)
+        }
+    }()
+
+    /// Thin liquid glass effect with thin material fallback and a faint background tint.
     nonisolated(unsafe) public static let thin: UniversalGlass = {
         if #available(iOS 26.0, macOS 26.0, *) {
+            let tint = systemBackgroundTint(opacity: 0.18)
+            let tintedGlass: Any = Glass.clear.tint(tint)
             return UniversalGlass(
                 fallbackMaterial: .thinMaterial,
-                liquidGlass: Glass.regular
+                liquidGlass: tintedGlass
             )
         } else {
             return UniversalGlass(fallbackMaterial: .thinMaterial)
         }
     }()
 
-    /// Ultra thin liquid glass effect with ultra thin material fallback.
+    /// Ultra thin liquid glass effect with ultra thin material fallback using clear glass.
     nonisolated(unsafe) public static let ultraThin: UniversalGlass = {
         if #available(iOS 26.0, macOS 26.0, *) {
             return UniversalGlass(
                 fallbackMaterial: .ultraThinMaterial,
-                liquidGlass: Glass.regular
+                liquidGlass: Glass.clear
             )
         } else {
             return UniversalGlass(fallbackMaterial: .ultraThinMaterial)
@@ -137,18 +177,18 @@ public enum UniversalGlassRendering {
 
 #if DEBUG
 #Preview("UniversalGlass presets") {
-    let glasses: [(title: String, configuration: UniversalGlass)] = [
-        ("Regular", .regular),
-        ("Clear + Tint", .clear.tint(.cyan)),
-        ("Ultrathin", .ultraThin),
+    let samples: [(title: String, configuration: UniversalGlass)] = [
+        ("Ultra Thin (Clear)", .ultraThin),
         ("Thin", .thin),
         ("Regular", .regular),
         ("Thick", .thick),
-        ("Interactive", .regular.interactive())
+        ("Ultra Thick", .ultraThick),
+        ("Clear + Cyan Tint", .clear.tint(.cyan)),
+        ("Regular Interactive", .regular.interactive())
     ]
 
     return VStack(spacing: 24) {
-        ForEach(Array(glasses.enumerated()), id: \.offset) { entry in
+        ForEach(Array(samples.enumerated()), id: \.offset) { entry in
             Label(entry.element.title, systemImage: "sparkles")
                 .font(.headline)
                 .padding(.horizontal, 36)
