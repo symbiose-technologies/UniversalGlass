@@ -12,7 +12,7 @@
   <a href="https://www.apple.com/macos/"><img src="https://badgen.net/badge/macOS/13+/blue" alt="macOS 13+"></a>
   <a href="https://developer.apple.com/tvos/"><img src="https://badgen.net/badge/tvOS/17+/blue" alt="tvOS 17+"></a>
   <a href="https://developer.apple.com/watchos/"><img src="https://badgen.net/badge/watchOS/10+/blue" alt="watchOS 10+"></a>
-  <a href="https://swift.org/"><img src="https://badgen.net/badge/Swift/6.0/orange" alt="Swift 6"></a>
+  <a href="https://swift.org/"><img src="https://badgen.net/badge/Swift/6.2/orange" alt="Swift 6.2"></a>
   <a href="https://developer.apple.com/xcode/"><img src="https://badgen.net/badge/Xcode/16+/blue" alt="Xcode 16"></a>
 </p>
         

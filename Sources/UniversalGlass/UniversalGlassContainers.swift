@@ -68,19 +68,17 @@ public extension View {
         if #available(iOS 26.0, macOS 26.0, *) {
             switch rendering {
             case .material:
-                self
-            case .automatic, .glass:
-                self.glassEffectID(id, in: namespace)
-            }
-        } else {
-            switch rendering {
-            case .material:
-                self
-            case .automatic, .glass:
                 self.transformEnvironment(\.glassEffectParticipantContext) { context in
                     context.effectID = AnyHashable(id)
                     context.union = GlassEffectUnion(id: AnyHashable(id), namespace: namespace)
                 }
+            case .automatic, .glass:
+                self.glassEffectID(id, in: namespace)
+            }
+        } else {
+            self.transformEnvironment(\.glassEffectParticipantContext) { context in
+                context.effectID = AnyHashable(id)
+                context.union = GlassEffectUnion(id: AnyHashable(id), namespace: namespace)
             }
         }
     }
