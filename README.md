@@ -36,6 +36,12 @@ OS 26 introduces new SwiftUI glass APIs, but these only ship on the latest platf
 
 ---
 
+## Known Issues
+
+- On pre-OS 26 systems the fallback `UniversalGlassEffectContainer` ignores the public `spacing` parameter; a fix is planned.
+
+---
+
 ## Installation
 
 Add UniversalGlass to your Package.swift dependencies:
