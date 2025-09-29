@@ -361,7 +361,7 @@ private struct GlassEffectUnionPreview: View {
                     Image(systemName: "sparkle")
                         .font(.title)
                         .frame(width: 80, height: 80)
-                        .universalGlassEffect()
+                        .universalGlassEffect(rendering: .material)
                     
                     if showMoon {
                         Image(systemName: "cloud")
