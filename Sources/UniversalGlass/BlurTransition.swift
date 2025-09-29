@@ -49,14 +49,14 @@ public extension AnyTransition {
     ///
     /// - Parameters:
     ///   - intensity: The blur radius applied during transition (default: 5)
-    ///   - scale: The scale factor applied during transition (default: 0.8)
-    ///   - scaleAnimation: The animation curve for the scaling effect (default: spring)
+    ///   - scale: The scale factor applied during transition (default: 0.9)
     ///
     /// - Returns: A combined transition that smoothly blurs and scales views
     ///
     /// Use this when you need fine control over the transition characteristics.
     /// Higher intensity values create more dramatic blur effects, while scale values
-    /// closer to 1.0 result in subtler size changes.
+    /// closer to 1.0 result in subtler size changes. Apply your preferred animation
+    /// separately to control timing (for example, `.animation(.spring(), value: state)`).
     static func blur(
         intensity: CGFloat = 5,
         scale: CGFloat = 0.9
