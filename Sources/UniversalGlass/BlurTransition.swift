@@ -59,8 +59,7 @@ public extension AnyTransition {
     /// closer to 1.0 result in subtler size changes.
     static func blur(
         intensity: CGFloat = 5,
-        scale: CGFloat = 0.9,
-        scaleAnimation: Animation = .spring()
+        scale: CGFloat = 0.9
     ) -> AnyTransition {
         .scale(scale: scale)
             .combined(
