@@ -155,13 +155,28 @@ When a runtime supports `GlassEffectContainer` or `glassEffectTransition`, Unive
 VStack {
     if showSettings {
         SettingsPanel()
-            .transition(.blurSmooth)
+            .transition(.blur)
     }
 
     Toggle("Show Settings", isOn: $showSettings)
         .universalGlassButtonStyle()
 }
 .animation(.easeInOut(duration: 0.3), value: showSettings)
+```
+
+Need a custom feel? Use `AnyTransition.blur(intensity:scale:)` and apply the timing via
+`.animation` on the parent view. When you explicitly need the back-port animation used
+under the hood, reach for `.fallbackBlur`:
+
+```swift
+// Force the same animation UniversalGlass uses on older platforms.
+SettingsPanel()
+    .transition(.fallbackBlur)
+
+// Dial in a custom blend while still supplying your own animation.
+SettingsPanel()
+    .transition(.blur(intensity: 8, scale: 0.85))
+    .animation(.spring(response: 0.5, dampingFraction: 0.8), value: showSettings)
 ```
 
 ### Opt-in Backports

@@ -26,12 +26,10 @@ public extension AnyTransition {
         .blur()
     }
 
-    /// A smooth blur transition with bouncy animation characteristics.
-    ///
-    /// Provides a more playful feel with elastic motion, ideal for interactive elements
-    /// or when you want to draw attention to the transition itself.
-    static var blurSmooth: AnyTransition {
-        .blur()
+    /// A convenience wrapper around the internal fallback transition used on
+    /// platforms without native glass animations.
+    static var fallbackBlur: AnyTransition {
+        .fallbackBlurTransition()
     }
 
     /// A blur-only transition without any scaling effect.
@@ -45,7 +43,7 @@ public extension AnyTransition {
         )
     }
 
-    /// A customizable blur transition with configurable intensity, scale, and animation.
+    /// A customizable blur transition with configurable intensity and scale.
     ///
     /// - Parameters:
     ///   - intensity: The blur radius applied during transition (default: 5)
@@ -68,6 +66,26 @@ public extension AnyTransition {
                     identity: BlurModifier(isIdentity: false, intensity: intensity)
                 )
             )
+    }
+    
+    
+    static func fallbackBlurTransition() -> AnyTransition {
+        .asymmetric(
+            insertion: .scale(scale: 0.8)
+                .combined(
+                    with: .modifier(
+                        active: BlurModifier(isIdentity: true, intensity: 5),
+                        identity: BlurModifier(isIdentity: false, intensity: 5)
+                    )
+                ),
+            removal: .scale(scale: 1.2)
+                .combined(
+                    with: .modifier(
+                        active: BlurModifier(isIdentity: true, intensity: 5),
+                        identity: BlurModifier(isIdentity: false, intensity: 5)
+                    )
+                )
+        )
     }
 }
 
@@ -105,7 +123,7 @@ public extension AnyTransition {
                 .transition(.blurWithoutScale)
             
             VStack(spacing: 12) {
-                Text("blurSmooth")
+                Text("fallbackBlur")
                     .font(.title3.weight(.semibold))
             }
             .padding(32)
@@ -114,7 +132,7 @@ public extension AnyTransition {
                 RoundedRectangle(cornerRadius: 28, style: .continuous)
                     .fill(.ultraThinMaterial)
             )
-            .transition(.blurSmooth)
+            .transition(.fallbackBlur)
             
             VStack(spacing: 12) {
                 Text("Custom")

@@ -240,7 +240,7 @@ private struct GlassEffectFallbackOverlay: View {
             ForEach(orderedKeys) { key in
                 if let members = grouped[key] {
                     GlassEffectUnionOverlay(members: members)
-                        .transition(.blur)
+                        .transition(.fallbackBlur)
                 }
             }
         }
