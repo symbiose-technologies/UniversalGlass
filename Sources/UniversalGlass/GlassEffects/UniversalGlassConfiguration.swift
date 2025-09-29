@@ -8,13 +8,13 @@ import UIKit
 private extension UniversalGlass {
     static func systemBackgroundTint(opacity: Double) -> Color {
         let base: Color
-        #if canImport(UIKit)
+#if canImport(UIKit)
         base = Color(UIColor.systemBackground)
-        #elseif canImport(AppKit) && !targetEnvironment(macCatalyst)
+#elseif canImport(AppKit) && !targetEnvironment(macCatalyst)
         base = Color(NSColor.windowBackgroundColor)
-        #else
+#else
         base = Color.white
-        #endif
+#endif
         return base.opacity(opacity)
     }
 }
@@ -28,17 +28,17 @@ import AppKit
 public struct UniversalGlass {
     let fallbackMaterial: Material
     private let _liquidGlass: Any?
-
+    
     @available(iOS 26.0, macOS 26.0, *)
     public var liquidGlass: Glass? {
         _liquidGlass as? Glass
     }
-
+    
     private init(fallbackMaterial: Material, liquidGlass: Any? = nil) {
         self.fallbackMaterial = fallbackMaterial
         self._liquidGlass = liquidGlass
     }
-
+    
     /// Regular liquid glass effect with regular material fallback.
     nonisolated(unsafe) public static let regular: UniversalGlass = {
         if #available(iOS 26.0, macOS 26.0, *) {
@@ -50,7 +50,7 @@ public struct UniversalGlass {
             return UniversalGlass(fallbackMaterial: .regularMaterial)
         }
     }()
-
+    
     /// Thick liquid glass effect with thick material fallback and subtle background tint.
     nonisolated(unsafe) public static let thick: UniversalGlass = {
         if #available(iOS 26.0, macOS 26.0, *) {
@@ -64,7 +64,7 @@ public struct UniversalGlass {
             return UniversalGlass(fallbackMaterial: .thickMaterial)
         }
     }()
-
+    
     /// Ultra thick liquid glass effect with ultra thick material fallback and stronger tinting.
     nonisolated(unsafe) public static let ultraThick: UniversalGlass = {
         if #available(iOS 26.0, macOS 26.0, *) {
@@ -78,7 +78,7 @@ public struct UniversalGlass {
             return UniversalGlass(fallbackMaterial: .ultraThickMaterial)
         }
     }()
-
+    
     /// Thin liquid glass effect with thin material fallback and a faint background tint.
     nonisolated(unsafe) public static let thin: UniversalGlass = {
         if #available(iOS 26.0, macOS 26.0, *) {
@@ -92,7 +92,7 @@ public struct UniversalGlass {
             return UniversalGlass(fallbackMaterial: .thinMaterial)
         }
     }()
-
+    
     /// Ultra thin liquid glass effect with ultra thin material fallback using clear glass.
     nonisolated(unsafe) public static let ultraThin: UniversalGlass = {
         if #available(iOS 26.0, macOS 26.0, *) {
@@ -104,7 +104,7 @@ public struct UniversalGlass {
             return UniversalGlass(fallbackMaterial: .ultraThinMaterial)
         }
     }()
-
+    
     /// Clear liquid glass effect with ultra thin material fallback.
     nonisolated(unsafe) public static let clear: UniversalGlass = {
         if #available(iOS 26.0, macOS 26.0, *) {
@@ -116,7 +116,7 @@ public struct UniversalGlass {
             return UniversalGlass(fallbackMaterial: .ultraThinMaterial)
         }
     }()
-
+    
     /// Creates a tinted liquid glass effect with the specified color.
     /// Falls back to regular material on older versions.
     public func tint(_ color: Color) -> UniversalGlass {
@@ -138,7 +138,7 @@ public struct UniversalGlass {
             return UniversalGlass(fallbackMaterial: fallbackMaterial)
         }
     }
-
+    
     /// Creates an interactive liquid glass effect.
     /// Falls back to the same material on older versions.
     public func interactive(_ isInteractive: Bool = true) -> UniversalGlass {
@@ -177,23 +177,42 @@ public enum UniversalGlassRendering {
 
 #if DEBUG
 #Preview("UniversalGlass presets") {
-    let samples: [(title: String, configuration: UniversalGlass)] = [
-        ("Ultra Thin (Clear)", .ultraThin),
+    let glassSamples: [(title: String, configuration: UniversalGlass)] = [
+        ("Regular", .regular),
+        ("Clear + Cyan Tint", .clear.tint(.cyan)),
+        ("Regular Interactive", .regular.interactive())
+    ]
+    let materialSamples: [(title: String, configuration: UniversalGlass)] = [
+        ("Ultra Thin", .ultraThin),
         ("Thin", .thin),
         ("Regular", .regular),
         ("Thick", .thick),
         ("Ultra Thick", .ultraThick),
-        ("Clear + Cyan Tint", .clear.tint(.cyan)),
-        ("Regular Interactive", .regular.interactive())
     ]
-
-    return VStack(spacing: 24) {
-        ForEach(Array(samples.enumerated()), id: \.offset) { entry in
-            Label(entry.element.title, systemImage: "sparkles")
-                .font(.headline)
-                .padding(.horizontal, 36)
-                .padding(.vertical, 16)
-                .universalGlassEffect(entry.element.configuration)
+    
+    VStack(spacing: 24) {
+        VStack(spacing: 24) {
+            ForEach(Array(glassSamples.enumerated()), id: \.offset) { entry in
+                Label(entry.element.title, systemImage: "sparkles")
+                    .font(.headline)
+                    .padding(.horizontal, 36)
+                    .padding(.vertical, 16)
+                    .universalGlassEffect(entry.element.configuration)
+            }
+        }
+        
+        Color.white.opacity(0.2)
+            .frame(height: 0.4)
+            .padding(.horizontal, 30)
+        
+        VStack(spacing: 24) {
+            ForEach(Array(materialSamples.enumerated()), id: \.offset) { entry in
+                Label(entry.element.title, systemImage: "sparkles")
+                    .font(.headline)
+                    .padding(.horizontal, 36)
+                    .padding(.vertical, 16)
+                    .universalGlassEffect(entry.element.configuration)
+            }
         }
     }
     .frame(maxWidth: .infinity, maxHeight: .infinity)

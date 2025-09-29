@@ -104,6 +104,14 @@ Circle()
     .universalGlassEffect(in: Circle())
 ```
 
+Preset helpers roughly match Apple’s tiers:
+
+- `.ultraThin` → clear glass
+- `.thin` → clear glass with a light tint from the system background
+- `.regular` → regular liquid glass
+- `.thick` → regular glass with a stronger background tint
+- `.ultraThick` → regular glass with a deep background tint
+
 ### Glass Button Styles
 
 ```swift
