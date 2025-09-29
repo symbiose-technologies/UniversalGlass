@@ -273,50 +273,51 @@ private struct UniversalGlassFallbackBackground: ViewModifier {
     }
 }
 
+
 #if DEBUG
-#Preview("Universal glass modifiers") {
-    @Previewable @Namespace var namespace
-    @Previewable @State var showDetail = true
-
-    UniversalGlassEffectContainer(rendering: .automatic) {
+#Preview("UniversalGlass presets") {
+    let glassSamples: [(title: String, configuration: UniversalGlass)] = [
+        ("Regular", .regular),
+        ("Clear + Cyan Tint", .clear.tint(.cyan)),
+        ("Regular Interactive", .regular.interactive())
+    ]
+    let materialSamples: [(title: String, configuration: UniversalGlass)] = [
+        ("Ultra Thin", .ultraThin),
+        ("Thin", .thin),
+        ("Regular", .regular),
+        ("Thick", .thick),
+        ("Ultra Thick", .ultraThick),
+    ]
+    
+    VStack(spacing: 24) {
         VStack(spacing: 24) {
-            HStack(spacing: 16) {
-                Image(systemName: "sparkles")
-                    .font(.title)
-                    .frame(width: 80, height: 80)
-                    .universalGlassEffect()
-                    .universalGlassEffectUnion(id: "cluster", namespace: namespace)
-
-                Image(systemName: "moon.stars")
-                    .font(.title)
-                    .frame(width: 80, height: 80)
-                    .universalGlassEffect(.regular.tint(.purple))
-                    .universalGlassEffectUnion(id: "cluster", namespace: namespace)
+            ForEach(Array(glassSamples.enumerated()), id: \.offset) { entry in
+                Label(entry.element.title, systemImage: "sparkles")
+                    .font(.headline)
+                    .padding(.horizontal, 36)
+                    .padding(.vertical, 16)
+                    .universalGlassEffect(entry.element.configuration)
             }
-
-            if showDetail {
-                Text("Matched geometry joins the icons into one glass slab on older OS versions.")
-                    .font(.caption)
-                    .multilineTextAlignment(.center)
-                    .padding(20)
-                    .universalGlassEffect(
-                        .clear.interactive(),
-                        in: RoundedRectangle(cornerRadius: 24, style: .continuous)
-                    )
-                    .universalGlassEffectTransition(.materialize)
-            }
-
-            Toggle("Show Details", isOn: $showDetail)
-                .toggleStyle(.switch)
-                .padding(.horizontal, 32)
         }
-        .padding(24)
+        
+        Color.white.opacity(0.2)
+            .frame(height: 0.4)
+            .padding(.horizontal, 30)
+        
+        VStack(spacing: 24) {
+            ForEach(Array(materialSamples.enumerated()), id: \.offset) { entry in
+                Label(entry.element.title, systemImage: "sparkles")
+                    .font(.headline)
+                    .padding(.horizontal, 36)
+                    .padding(.vertical, 16)
+                    .universalGlassEffect(entry.element.configuration)
+            }
+        }
     }
-    .animation(.spring(response: 0.45, dampingFraction: 0.8), value: showDetail)
     .frame(maxWidth: .infinity, maxHeight: .infinity)
     .background(
         LinearGradient(
-            colors: [Color(red: 0.04, green: 0.10, blue: 0.28), Color(red: 0.10, green: 0.30, blue: 0.42)],
+            colors: [Color(red: 0.05, green: 0.18, blue: 0.34), Color(red: 0.04, green: 0.32, blue: 0.44)],
             startPoint: .topLeading,
             endPoint: .bottomTrailing
         ).ignoresSafeArea()

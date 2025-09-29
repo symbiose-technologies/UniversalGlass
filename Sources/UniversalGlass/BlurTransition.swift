@@ -31,7 +31,7 @@ public extension AnyTransition {
     /// Provides a more playful feel with elastic motion, ideal for interactive elements
     /// or when you want to draw attention to the transition itself.
     static var blurSmooth: AnyTransition {
-        .blur(scaleAnimation: Animation.bouncy)
+        .blur()
     }
 
     /// A blur-only transition without any scaling effect.
@@ -59,11 +59,10 @@ public extension AnyTransition {
     /// closer to 1.0 result in subtler size changes.
     static func blur(
         intensity: CGFloat = 5,
-        scale: CGFloat = 0.8,
+        scale: CGFloat = 0.9,
         scaleAnimation: Animation = .spring()
     ) -> AnyTransition {
         .scale(scale: scale)
-            .animation(scaleAnimation)
             .combined(
                 with: .modifier(
                     active: BlurModifier(isIdentity: true, intensity: intensity),
@@ -78,19 +77,37 @@ public extension AnyTransition {
     @Previewable @State var showDetails = true
 
     VStack(spacing: 20) {
-        Toggle("Show Details", isOn: $showDetails)
-            .toggleStyle(.switch)
-            .padding(.horizontal, 32)
-
         Spacer()
 
         if showDetails {
             VStack(spacing: 12) {
-                Text("Liquid Glass")
+                Text("blur")
                     .font(.title3.weight(.semibold))
-                Text("Appears with blur and scale")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+            }
+            .padding(32)
+            .frame(maxWidth: .infinity)
+            .background(
+                RoundedRectangle(cornerRadius: 28, style: .continuous)
+                    .fill(.ultraThinMaterial)
+            )
+            .transition(.blur.animation(.bouncy))
+            
+            
+                VStack(spacing: 12) {
+                    Text("blurWithoutScale")
+                        .font(.title3.weight(.semibold))
+                }
+                .padding(32)
+                .frame(maxWidth: .infinity)
+                .background(
+                    RoundedRectangle(cornerRadius: 28, style: .continuous)
+                        .fill(.ultraThinMaterial)
+                )
+                .transition(.blurWithoutScale)
+            
+            VStack(spacing: 12) {
+                Text("blurSmooth")
+                    .font(.title3.weight(.semibold))
             }
             .padding(32)
             .frame(maxWidth: .infinity)
@@ -99,15 +116,33 @@ public extension AnyTransition {
                     .fill(.ultraThinMaterial)
             )
             .transition(.blurSmooth)
+            
+            VStack(spacing: 12) {
+                Text("Custom")
+                    .font(.title3.weight(.semibold))
+            }
+            .padding(32)
+            .frame(maxWidth: .infinity)
+            .background(
+                RoundedRectangle(cornerRadius: 28, style: .continuous)
+                    .fill(.ultraThinMaterial)
+            )
+            .transition(.blur(intensity: 10, scale: 1.2))
         }
 
         Spacer()
+        
+        Button("Toggle"){
+            showDetails.toggle()
+        }
+        .foregroundStyle(.white)
     }
+    .padding(32)
     .animation(.spring(response: 0.45, dampingFraction: 0.8), value: showDetails)
     .padding()
     .frame(maxWidth: .infinity, maxHeight: .infinity)
     .background(
-        LinearGradient(colors: [.indigo.opacity(0.7), .black], startPoint: .top, endPoint: .bottom)
+        LinearGradient(colors: [.green, .blue], startPoint: .top, endPoint: .bottom)
             .ignoresSafeArea()
     )
 }
