@@ -142,17 +142,14 @@ private struct FallbackGlassEffectContainerRenderer<Content: View>: View {
                 .environment(\.glassEffectParticipantContext, GlassEffectParticipantContext())
                 .environment(\.isInFallbackGlassContainer, true)
         }
-        .mask({
-            Color.black
-                .overlayPreferenceValue(GlassEffectParticipantsKey.self) { participants in
-                    GeometryReader { proxy in
-                        GlassEffectFallbackOverlay(participants: participants, proxy: proxy)
-                    }
-                }
-        })
+        .overlayPreferenceValue(GlassEffectParticipantsKey.self) { participants in
+            GeometryReader { proxy in
+                GlassEffectFallbackMask(participants: participants, proxy: proxy)
+            }
+        }
         .backgroundPreferenceValue(GlassEffectParticipantsKey.self) { participants in
             GeometryReader { proxy in
-                GlassEffectFallbackOverlay(participants: participants, proxy: proxy)
+                GlassEffectFallbackBackground(participants: participants, proxy: proxy)
             }
         }
        
@@ -217,7 +214,7 @@ private extension GlassEffectParticipant {
     }
 }
 
-private struct GlassEffectFallbackOverlay: View {
+private struct GlassEffectFallbackBackground: View {
     let participants: [GlassEffectParticipant]
     let proxy: GeometryProxy
 
@@ -239,7 +236,7 @@ private struct GlassEffectFallbackOverlay: View {
         return ZStack(alignment: .topLeading) {
             ForEach(orderedKeys) { key in
                 if let members = grouped[key] {
-                    GlassEffectUnionOverlay(members: members)
+                    GlassEffectUnionBackground(members: members)
                         .transition(.fallbackBlur)
                 }
             }
@@ -248,7 +245,38 @@ private struct GlassEffectFallbackOverlay: View {
     }
 }
 
-private struct GlassEffectUnionOverlay: View {
+private struct GlassEffectFallbackMask: View {
+    let participants: [GlassEffectParticipant]
+    let proxy: GeometryProxy
+
+    @State private var overlayVersion = 0
+
+    var body: some View {
+        let resolved = participants.enumerated().map { index, participant in
+            participant.resolve(in: proxy, order: index)
+        }
+
+        var grouped: [GlassEffectGroupingKey: [ResolvedGlassEffectParticipant]] = [:]
+        for participant in resolved {
+            let key = participant.groupingKey
+            grouped[key, default: []].append(participant)
+        }
+
+        let orderedKeys = grouped.keys.sorted(by: { $0.id.hashValue < $1.id.hashValue })
+
+        return ZStack(alignment: .topLeading) {
+            ForEach(orderedKeys) { key in
+                if let members = grouped[key] {
+                    GlassEffectUnionMask(members: members)
+                        .transition(.fallbackBlur)
+                }
+            }
+        }
+        .allowsHitTesting(false)
+    }
+}
+
+private struct GlassEffectUnionBackground: View {
     let members: [ResolvedGlassEffectParticipant]
 
     var body: some View {
@@ -272,6 +300,29 @@ private struct GlassEffectUnionOverlay: View {
     }
 }
 
+private struct GlassEffectUnionMask: View {
+    let members: [ResolvedGlassEffectParticipant]
+
+    var body: some View {
+        guard let anchor = members.min(by: { $0.order < $1.order }) else {
+            return AnyView(EmptyView())
+        }
+
+        let bounds = members.reduce(anchor.frame) { partial, participant in
+            partial.union(participant.frame)
+        }
+
+        let shape = anchor.shape ?? AnyGlassShape(Capsule())
+
+        return AnyView(
+            Color.red
+                .clipShape(shape)
+                .frame(width: bounds.width, height: bounds.height)
+                .position(x: bounds.midX, y: bounds.midY)
+        )
+    }
+}
+
 private extension CGRect {
     func union(_ other: CGRect) -> CGRect {
         CGRect(x: min(minX, other.minX),
@@ -286,13 +337,13 @@ private extension CGRect {
 #if DEBUG
 private struct GlassEffectUnionPreview: View {
     @Namespace private var namespace
-    @State private var showMoon = true
+    @State private var showMoon = false
 
     var body: some View {
-        HStack(spacing: 30){
+        VStack(spacing: 30){
             UniversalGlassEffectContainer() {
-                VStack(spacing: 20) {
-                    VStack(spacing: 0) {
+                HStack(spacing: 20) {
+                    HStack(spacing: 0) {
                         
                         if showMoon {
                             Image(systemName: "moon")
@@ -309,37 +360,46 @@ private struct GlassEffectUnionPreview: View {
                             .universalGlassEffectUnion(id: "star and moon", namespace: namespace)
                         
                     }
-
+                    
                     Image(systemName: "sparkle")
                         .font(.title)
                         .frame(width: 80, height: 80)
                         .universalGlassEffect()
                     
                     if showMoon {
+                    HStack(spacing: 0) {
                         Image(systemName: "cloud")
                             .font(.title)
                             .frame(width: 80, height: 80)
                             .universalGlassEffect()
                             .universalGlassEffectTransition(.matchedGeometry)
                             .universalGlassEffectUnion(id: "star2 and moon", namespace: namespace)
-                    }
                     
-                    if showMoon {
-                        Image(systemName: "sunglasses")
-                            .font(.title)
-                            .frame(width: 80, height: 80)
-                            .universalGlassEffect()
-                            .universalGlassEffectTransition(.matchedGeometry)
-                            .universalGlassEffectUnion(id: "star2 and moon", namespace: namespace)
+                    
+                    Image(systemName: "sunglasses")
+                        .font(.title)
+                        .frame(width: 80, height: 80)
+                        .universalGlassEffect()
+                        .universalGlassEffectTransition(.matchedGeometry)
+                        .universalGlassEffectUnion(id: "star2 and moon", namespace: namespace)
+                    
+                }
                     }
                     
                 }
             }
-            .frame(maxWidth: .infinity)
+            .overlay(content: {
+                HStack{
+                    Text("Liquid Glass · iOS 26").frame(maxWidth: .infinity)
+                }
+                .offset(y: -100)
+                .font(.body.weight(.semibold))
+                .foregroundStyle(.white)
+            })
             
             UniversalGlassEffectContainer(rendering: .material) {
-                VStack(spacing: 20) {
-                    VStack(spacing: 0) {
+                HStack(spacing: 20) {
+                    HStack(spacing: 0) {
                         
 
                     if showMoon {
@@ -363,40 +423,39 @@ private struct GlassEffectUnionPreview: View {
                         .frame(width: 80, height: 80)
                         .universalGlassEffect(rendering: .material)
                     
-                    if showMoon {
-                        Image(systemName: "cloud")
-                            .font(.title)
-                            .frame(width: 80, height: 80)
-                            .universalGlassEffect(rendering: .material)
-                            .universalGlassEffectTransition(.matchedGeometry)
-                            .universalGlassEffectUnion(id: "star2 and moon", namespace: namespace, rendering: .material)
+                        if showMoon {
+                    HStack(spacing: 0) {
+                            Image(systemName: "cloud")
+                                .font(.title)
+                                .frame(width: 80, height: 80)
+                                .universalGlassEffect(rendering: .material)
+                                .universalGlassEffectTransition(.matchedGeometry)
+                                .universalGlassEffectUnion(id: "star2 and moon", namespace: namespace, rendering: .material)
+                        
+                        
+                            Image(systemName: "sunglasses")
+                                .font(.title)
+                                .frame(width: 80, height: 80)
+                                .universalGlassEffect(rendering: .material)
+                                .universalGlassEffectTransition(.matchedGeometry)
+                                .universalGlassEffectUnion(id: "star2 and moon", namespace: namespace, rendering: .material)
+                        }
                     }
-                    
-                    if showMoon {
-                        Image(systemName: "sunglasses")
-                            .font(.title)
-                            .frame(width: 80, height: 80)
-                            .universalGlassEffect(rendering: .material)
-                            .universalGlassEffectTransition(.matchedGeometry)
-                            .universalGlassEffectUnion(id: "star2 and moon", namespace: namespace, rendering: .material)
-                    }
-                    
                 }
             }.frame(maxWidth: .infinity)
+                .overlay(content: {
+                    HStack{
+                        Text("Fallback · iOS 18").frame(maxWidth: .infinity)
+                    }
+                    .padding(.horizontal, 60)
+                    .offset(y: 100)
+                    .font(.body.weight(.semibold))
+                    .foregroundStyle(.white)
+                })
+            
         }
         .padding(.horizontal, 60)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .overlay(content: {
-            HStack{
-                Text("Liquid Glass").frame(maxWidth: .infinity)
-                
-                Text("Fallback").frame(maxWidth: .infinity)
-            }
-            .padding(.horizontal, 60)
-            .offset(y: 270)
-            .font(.body.weight(.semibold))
-            .foregroundStyle(.white)
-        })
         .safeAreaInset(edge: .bottom) {
             VStack(spacing: 12) {
                 Button(showMoon ? "Hide" : "Show") {
@@ -410,8 +469,8 @@ private struct GlassEffectUnionPreview: View {
         .background(
             LinearGradient(
                 colors: [
-                    Color(red: 0.15, green: 0.58, blue: 0.72),
-                    Color(red: 0.40, green: 0.30, blue: 0.86)
+                    Color(red: 0.25, green: 0.68, blue: 0.32),
+                    Color(red: 0.20, green: 0.70, blue: 0.56)
                 ],
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
