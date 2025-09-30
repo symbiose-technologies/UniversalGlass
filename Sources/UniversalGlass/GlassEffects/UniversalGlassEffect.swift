@@ -56,6 +56,7 @@ struct GlassEffectParticipant: Identifiable {
     let shape: AnyGlassShape?
     let glass: UniversalGlass?
     let fallbackMaterial: Material
+    let fallbackTint: Color?
     let rendering: UniversalGlassRendering
     let drawsOwnBackground: Bool
 }
@@ -233,9 +234,10 @@ private struct UniversalGlassEffectModifier: ViewModifier {
     func body(content: Content) -> some View {
         let drawsBackground = !isInContainer
         let material = glassConfiguration?.fallbackMaterial ?? fallbackMaterial
+        let tint = glassConfiguration?.fallbackTint
         let targetShape = shape ?? AnyGlassShape(Capsule())
         let base = drawsBackground
-            ? AnyView(content.modifier(UniversalGlassFallbackBackground(material: material, shape: targetShape)))
+            ? AnyView(content.modifier(UniversalGlassFallbackBackground(material: material, tint: tint, shape: targetShape)))
             : AnyView(content)
         return base
             .transition(.blur)
@@ -249,6 +251,7 @@ private struct UniversalGlassEffectModifier: ViewModifier {
                     shape: shape,
                     glass: glassConfiguration,
                     fallbackMaterial: material,
+                    fallbackTint: tint,
                     rendering: rendering,
                     drawsOwnBackground: drawsBackground
                 )]
@@ -259,16 +262,23 @@ private struct UniversalGlassEffectModifier: ViewModifier {
 
 private struct UniversalGlassFallbackBackground: ViewModifier {
     let material: Material
+    let tint: Color?
     let shape: AnyGlassShape
 
     func body(content: Content) -> some View {
-        if #available(iOS 15.0, macOS 13.0, *) {
-            content.background(
-                material.shadow(.drop(color: .black.opacity(0.04), radius: 8)),
-                in: shape
-            )
-        } else {
-            content.background(material, in: shape)
+        content.background {
+            ZStack {
+                if let tint {
+                    shape.fill(tint)
+                }
+                if #available(iOS 15.0, macOS 13.0, *) {
+                    shape
+                        .fill(material)
+                        .shadow(color: Color.black.opacity(0.04), radius: 8)
+                } else {
+                    shape.fill(material)
+                }
+            }
         }
     }
 }
@@ -277,19 +287,21 @@ private struct UniversalGlassFallbackBackground: ViewModifier {
 #if DEBUG
 #Preview("UniversalGlass presets") {
     let glassSamples: [(title: String, configuration: UniversalGlass)] = [
-        ("Regular", .regular),
-        ("Clear + Cyan Tint", .clear.tint(.cyan)),
-        ("Regular Interactive", .regular.interactive())
+        ("Clear", .clear.interactive()),
+        ("Clear + Cyan Tint", .clear.tint(.cyan).interactive()),
+        ("Regular", .regular.interactive())
     ]
     let materialSamples: [(title: String, configuration: UniversalGlass)] = [
-        ("Ultra Thin", .ultraThin),
-        ("Thin", .thin),
-        ("Regular", .regular),
-        ("Thick", .thick),
-        ("Ultra Thick", .ultraThick),
+        ("Ultra Thin", .ultraThin.interactive()),
+        ("Thin", .thin.interactive()),
+        ("Regular", .regular.interactive()),
+        ("Thick", .thick.interactive()),
+        ("Ultra Thick", .ultraThick.interactive()),
     ]
     
     VStack(spacing: 24) {
+        Text("Glass Types")
+            .foregroundStyle(.white)
         VStack(spacing: 24) {
             ForEach(Array(glassSamples.enumerated()), id: \.offset) { entry in
                 Label(entry.element.title, systemImage: "sparkles")
@@ -300,10 +312,9 @@ private struct UniversalGlassFallbackBackground: ViewModifier {
             }
         }
         
-        Color.white.opacity(0.2)
-            .frame(height: 0.4)
-            .padding(.horizontal, 30)
         
+        Text("Material Types")
+            .foregroundStyle(.white)
         VStack(spacing: 24) {
             ForEach(Array(materialSamples.enumerated()), id: \.offset) { entry in
                 Label(entry.element.title, systemImage: "sparkles")
@@ -316,11 +327,11 @@ private struct UniversalGlassFallbackBackground: ViewModifier {
     }
     .frame(maxWidth: .infinity, maxHeight: .infinity)
     .background(
-        LinearGradient(
-            colors: [Color(red: 0.05, green: 0.18, blue: 0.34), Color(red: 0.04, green: 0.32, blue: 0.44)],
-            startPoint: .topLeading,
-            endPoint: .bottomTrailing
-        ).ignoresSafeArea()
+        Image("tulips", bundle: .module)
+            .resizable()
+        .ignoresSafeArea()
+        
+        // Photo by <a href="https://unsplash.com/@mike_loftus?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash">Michael Loftus</a> on <a href="https://unsplash.com/photos/a-field-of-yellow-tulips-under-a-blue-sky-aK4Slh-4uhU?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash">Unsplash</a>
     )
 }
 #endif

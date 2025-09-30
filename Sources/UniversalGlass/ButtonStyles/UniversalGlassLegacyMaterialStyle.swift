@@ -162,9 +162,13 @@ private struct UniversalGlassLegacyMaterialBody: View {
     }
     .padding(32)
     .frame(maxWidth: .infinity, maxHeight: .infinity)
+    
     .background(
-        LinearGradient(colors: [.pink.opacity(0.2), .purple.opacity(0.7)], startPoint: .topLeading, endPoint: .bottomTrailing)
-            .ignoresSafeArea()
+        Image("tulips", bundle: .module)
+            .resizable()
+        .ignoresSafeArea()
+        
+        // Photo by <a href="https://unsplash.com/@mike_loftus?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash">Michael Loftus</a> on <a href="https://unsplash.com/photos/a-field-of-yellow-tulips-under-a-blue-sky-aK4Slh-4uhU?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash">Unsplash</a>
     )
 }
 #endif

@@ -158,9 +158,13 @@ public extension AnyTransition {
     .animation(.spring(response: 0.45, dampingFraction: 0.8), value: showDetails)
     .padding()
     .frame(maxWidth: .infinity, maxHeight: .infinity)
+    
     .background(
-        LinearGradient(colors: [.green, .blue], startPoint: .top, endPoint: .bottom)
-            .ignoresSafeArea()
+        Image("tulips", bundle: .module)
+            .resizable()
+        .ignoresSafeArea()
+        
+        // Photo by <a href="https://unsplash.com/@mike_loftus?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash">Michael Loftus</a> on <a href="https://unsplash.com/photos/a-field-of-yellow-tulips-under-a-blue-sky-aK4Slh-4uhU?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash">Unsplash</a>
     )
 }
 #endif

@@ -27,6 +27,7 @@ import AppKit
 /// A configuration type that provides liquid glass effects on iOS 26+ and material fallbacks on older versions.
 public struct UniversalGlass {
     let fallbackMaterial: Material
+    let fallbackTint: Color?
     private let _liquidGlass: Any?
     
     @available(iOS 26.0, macOS 26.0, *)
@@ -34,8 +35,13 @@ public struct UniversalGlass {
         _liquidGlass as? Glass
     }
     
-    private init(fallbackMaterial: Material, liquidGlass: Any? = nil) {
+    private init(
+        fallbackMaterial: Material,
+        fallbackTint: Color? = nil,
+        liquidGlass: Any? = nil
+    ) {
         self.fallbackMaterial = fallbackMaterial
+        self.fallbackTint = fallbackTint
         self._liquidGlass = liquidGlass
     }
     
@@ -44,6 +50,7 @@ public struct UniversalGlass {
         if #available(iOS 26.0, macOS 26.0, *) {
             return UniversalGlass(
                 fallbackMaterial: .regularMaterial,
+                fallbackTint: nil,
                 liquidGlass: Glass.regular
             )
         } else {
@@ -54,29 +61,37 @@ public struct UniversalGlass {
     /// Thick liquid glass effect with thick material fallback and subtle background tint.
     nonisolated(unsafe) public static let thick: UniversalGlass = {
         if #available(iOS 26.0, macOS 26.0, *) {
-            let tint = systemBackgroundTint(opacity: 0.28)
+            let tint = systemBackgroundTint(opacity: 0.4)
             let tintedGlass: Any = Glass.regular.tint(tint)
             return UniversalGlass(
                 fallbackMaterial: .thickMaterial,
+                fallbackTint: tint,
                 liquidGlass: tintedGlass
             )
-        } else {
-            return UniversalGlass(fallbackMaterial: .thickMaterial)
-        }
+        } 
+        let tint = systemBackgroundTint(opacity: 0.4)
+        return UniversalGlass(
+            fallbackMaterial: .thickMaterial,
+            fallbackTint: tint
+        )
     }()
     
     /// Ultra thick liquid glass effect with ultra thick material fallback and stronger tinting.
     nonisolated(unsafe) public static let ultraThick: UniversalGlass = {
         if #available(iOS 26.0, macOS 26.0, *) {
-            let tint = systemBackgroundTint(opacity: 0.42)
+            let tint = systemBackgroundTint(opacity: 0.7)
             let tintedGlass: Any = Glass.regular.tint(tint)
             return UniversalGlass(
                 fallbackMaterial: .ultraThickMaterial,
+                fallbackTint: tint,
                 liquidGlass: tintedGlass
             )
-        } else {
-            return UniversalGlass(fallbackMaterial: .ultraThickMaterial)
         }
+        let tint = systemBackgroundTint(opacity: 0.7)
+        return UniversalGlass(
+            fallbackMaterial: .ultraThickMaterial,
+            fallbackTint: tint
+        )
     }()
     
     /// Thin liquid glass effect with thin material fallback and a faint background tint.
@@ -86,11 +101,15 @@ public struct UniversalGlass {
             let tintedGlass: Any = Glass.clear.tint(tint)
             return UniversalGlass(
                 fallbackMaterial: .thinMaterial,
+                fallbackTint: tint,
                 liquidGlass: tintedGlass
             )
-        } else {
-            return UniversalGlass(fallbackMaterial: .thinMaterial)
         }
+        let tint = systemBackgroundTint(opacity: 0.18)
+        return UniversalGlass(
+            fallbackMaterial: .thinMaterial,
+            fallbackTint: tint
+        )
     }()
     
     /// Ultra thin liquid glass effect with ultra thin material fallback using clear glass.
@@ -98,6 +117,7 @@ public struct UniversalGlass {
         if #available(iOS 26.0, macOS 26.0, *) {
             return UniversalGlass(
                 fallbackMaterial: .ultraThinMaterial,
+                fallbackTint: nil,
                 liquidGlass: Glass.clear
             )
         } else {
@@ -110,6 +130,7 @@ public struct UniversalGlass {
         if #available(iOS 26.0, macOS 26.0, *) {
             return UniversalGlass(
                 fallbackMaterial: .ultraThinMaterial,
+                fallbackTint: nil,
                 liquidGlass: Glass.clear
             )
         } else {
@@ -125,17 +146,22 @@ public struct UniversalGlass {
                 let tintedGlass: Any = existingGlass.tint(color)
                 return UniversalGlass(
                     fallbackMaterial: fallbackMaterial,
+                    fallbackTint: color,
                     liquidGlass: tintedGlass
                 )
             } else {
                 let tintedGlass: Any = Glass.regular.tint(color)
                 return UniversalGlass(
                     fallbackMaterial: fallbackMaterial,
+                    fallbackTint: color,
                     liquidGlass: tintedGlass
                 )
             }
         } else {
-            return UniversalGlass(fallbackMaterial: fallbackMaterial)
+            return UniversalGlass(
+                fallbackMaterial: fallbackMaterial,
+                fallbackTint: color
+            )
         }
     }
     
@@ -147,17 +173,22 @@ public struct UniversalGlass {
                 let interactiveGlass: Any = existingGlass.interactive(isInteractive)
                 return UniversalGlass(
                     fallbackMaterial: fallbackMaterial,
+                    fallbackTint: fallbackTint,
                     liquidGlass: interactiveGlass
                 )
             } else {
                 let interactiveGlass: Any = Glass.regular.interactive(isInteractive)
                 return UniversalGlass(
                     fallbackMaterial: fallbackMaterial,
+                    fallbackTint: fallbackTint,
                     liquidGlass: interactiveGlass
                 )
             }
         } else {
-            return UniversalGlass(fallbackMaterial: fallbackMaterial)
+            return UniversalGlass(
+                fallbackMaterial: fallbackMaterial,
+                fallbackTint: fallbackTint
+            )
         }
     }
 }

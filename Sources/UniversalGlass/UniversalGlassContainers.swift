@@ -168,6 +168,7 @@ private struct ResolvedGlassEffectParticipant: Identifiable {
     let shape: AnyGlassShape?
     let glass: UniversalGlass?
     let fallbackMaterial: Material
+    let fallbackTint: Color?
     let rendering: UniversalGlassRendering
     let drawsOwnBackground: Bool
     let order: Int
@@ -210,6 +211,7 @@ private extension GlassEffectParticipant {
             shape: shape,
             glass: glass,
             fallbackMaterial: fallbackMaterial,
+            fallbackTint: fallbackTint,
             rendering: rendering,
             drawsOwnBackground: drawsOwnBackground,
             order: order
@@ -221,8 +223,6 @@ private struct GlassEffectFallbackBackground: View {
     let participants: [GlassEffectParticipant]
     let proxy: GeometryProxy
 
-    @State private var overlayVersion = 0
-
     var body: some View {
         let resolved = participants.enumerated().map { index, participant in
             participant.resolve(in: proxy, order: index)
@@ -230,11 +230,10 @@ private struct GlassEffectFallbackBackground: View {
 
         var grouped: [GlassEffectGroupingKey: [ResolvedGlassEffectParticipant]] = [:]
         for participant in resolved {
-            let key = participant.groupingKey
-            grouped[key, default: []].append(participant)
+            grouped[participant.groupingKey, default: []].append(participant)
         }
 
-        let orderedKeys = grouped.keys.sorted(by: { $0.id.hashValue < $1.id.hashValue })
+        let orderedKeys = grouped.keys.sorted { $0.id.hashValue < $1.id.hashValue }
 
         return ZStack(alignment: .topLeading) {
             ForEach(orderedKeys) { key in
@@ -244,40 +243,45 @@ private struct GlassEffectFallbackBackground: View {
                 }
             }
         }
+        .frame(width: proxy.size.width, height: proxy.size.height, alignment: .topLeading)
         .allowsHitTesting(false)
     }
 }
 
-//private struct GlassEffectFallbackMask: View {
-//    let participants: [GlassEffectParticipant]
-//    let proxy: GeometryProxy
-//
-//    @State private var overlayVersion = 0
-//
-//    var body: some View {
-//        let resolved = participants.enumerated().map { index, participant in
-//            participant.resolve(in: proxy, order: index)
-//        }
-//
-//        var grouped: [GlassEffectGroupingKey: [ResolvedGlassEffectParticipant]] = [:]
-//        for participant in resolved {
-//            let key = participant.groupingKey
-//            grouped[key, default: []].append(participant)
-//        }
-//
-//        let orderedKeys = grouped.keys.sorted(by: { $0.id.hashValue < $1.id.hashValue })
-//
-//        return ZStack(alignment: .topLeading) {
-//            ForEach(orderedKeys) { key in
-//                if let members = grouped[key] {
-//                    GlassEffectUnionMask(members: members)
-//                        .transition(.fallbackBlur)
-//                }
-//            }
-//        }
-//        .allowsHitTesting(false)
-//    }
-//}
+private struct GlassEffectFallbackMask: View {
+    let participants: [GlassEffectParticipant]
+    let proxy: GeometryProxy
+
+    var body: some View {
+        let resolved = participants.enumerated().map { index, participant in
+            participant.resolve(in: proxy, order: index)
+        }
+
+        if resolved.isEmpty {
+            return AnyView(Color.white)
+        }
+
+        var grouped: [GlassEffectGroupingKey: [ResolvedGlassEffectParticipant]] = [:]
+        for participant in resolved {
+            grouped[participant.groupingKey, default: []].append(participant)
+        }
+
+        let orderedKeys = grouped.keys.sorted { $0.id.hashValue < $1.id.hashValue }
+
+        return AnyView(
+            ZStack(alignment: .topLeading) {
+                ForEach(orderedKeys) { key in
+                    if let members = grouped[key] {
+                        GlassEffectUnionMask(members: members)
+                            .transition(.fallbackBlur)
+                    }
+                }
+            }
+            .frame(width: proxy.size.width, height: proxy.size.height, alignment: .topLeading)
+            .allowsHitTesting(false)
+        )
+    }
+}
 
 private struct GlassEffectUnionBackground: View {
     let members: [ResolvedGlassEffectParticipant]
@@ -293,38 +297,49 @@ private struct GlassEffectUnionBackground: View {
 
         let shape = anchor.shape ?? AnyGlassShape(Capsule())
         let material = anchor.glass?.fallbackMaterial ?? anchor.fallbackMaterial
+        let tint = anchor.glass?.fallbackTint ?? anchor.fallbackTint
 
         return AnyView(
-            Color.clear
-            .background(material.shadow(.drop(color: .black.opacity(0.04), radius: 8)), in: shape)
+            ZStack {
+                if let tint {
+                    shape.fill(tint)
+                }
+                if #available(iOS 15.0, macOS 13.0, *) {
+                    shape
+                        .fill(material)
+                        .shadow(color: Color.black.opacity(0.04), radius: 8)
+                } else {
+                    shape.fill(material)
+                }
+            }
+            .frame(width: bounds.width, height: bounds.height)
+            .position(x: bounds.midX, y: bounds.midY)
+        )
+    }
+}
+
+private struct GlassEffectUnionMask: View {
+    let members: [ResolvedGlassEffectParticipant]
+
+    var body: some View {
+        guard let anchor = members.min(by: { $0.order < $1.order }) else {
+            return AnyView(EmptyView())
+        }
+
+        let bounds = members.reduce(anchor.frame) { partial, participant in
+            partial.union(participant.frame)
+        }
+
+        let shape = anchor.shape ?? AnyGlassShape(Capsule())
+
+        return AnyView(
+            Color.white
+                .clipShape(shape)
                 .frame(width: bounds.width, height: bounds.height)
                 .position(x: bounds.midX, y: bounds.midY)
         )
     }
 }
-//
-//private struct GlassEffectUnionMask: View {
-//    let members: [ResolvedGlassEffectParticipant]
-//
-//    var body: some View {
-//        guard let anchor = members.min(by: { $0.order < $1.order }) else {
-//            return AnyView(EmptyView())
-//        }
-//
-//        let bounds = members.reduce(anchor.frame) { partial, participant in
-//            partial.union(participant.frame)
-//        }
-//
-//        let shape = anchor.shape ?? AnyGlassShape(Capsule())
-//
-//        return AnyView(
-//            Color.red
-//                .clipShape(shape)
-//                .frame(width: bounds.width, height: bounds.height)
-//                .position(x: bounds.midX, y: bounds.midY)
-//        )
-//    }
-//}
 
 private extension CGRect {
     func union(_ other: CGRect) -> CGRect {
@@ -469,15 +484,13 @@ private struct GlassEffectUnionPreview: View {
                 .universalGlassButtonStyle()
             }
         }
+        
         .background(
-            LinearGradient(
-                colors: [
-                    Color(red: 0.25, green: 0.68, blue: 0.32),
-                    Color(red: 0.20, green: 0.70, blue: 0.56)
-                ],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
+            Image("tulips", bundle: .module)
+                .resizable()
+            .ignoresSafeArea()
+            
+            // Photo by <a href="https://unsplash.com/@mike_loftus?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash">Michael Loftus</a> on <a href="https://unsplash.com/photos/a-field-of-yellow-tulips-under-a-blue-sky-aK4Slh-4uhU?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash">Unsplash</a>
         )
     }
 }
@@ -560,15 +573,13 @@ private struct GlassEffectTransitionPreview: View {
                 .universalGlassButtonStyle()
             }
         }
+        
         .background(
-            LinearGradient(
-                colors: [
-                    Color(red: 0.10, green: 0.12, blue: 0.35),
-                    Color(red: 0.32, green: 0.20, blue: 0.45)
-                ],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
+            Image("tulips", bundle: .module)
+                .resizable()
+            .ignoresSafeArea()
+            
+            // Photo by <a href="https://unsplash.com/@mike_loftus?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash">Michael Loftus</a> on <a href="https://unsplash.com/photos/a-field-of-yellow-tulips-under-a-blue-sky-aK4Slh-4uhU?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash">Unsplash</a>
         )
     }
 }
