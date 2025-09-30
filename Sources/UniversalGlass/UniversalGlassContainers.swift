@@ -142,11 +142,14 @@ private struct FallbackGlassEffectContainerRenderer<Content: View>: View {
                 .environment(\.glassEffectParticipantContext, GlassEffectParticipantContext())
                 .environment(\.isInFallbackGlassContainer, true)
         }
-        .overlayPreferenceValue(GlassEffectParticipantsKey.self) { participants in
-            GeometryReader { proxy in
-                GlassEffectFallbackMask(participants: participants, proxy: proxy)
-            }
-        }
+//        .overlayPreferenceValue(GlassEffectParticipantsKey.self) { participants in
+//            GeometryReader { proxy in
+//                GlassEffectFallbackMask(participants: participants, proxy: proxy)
+//            }
+//        }
+        .mask({
+            Capsule()
+        })
         .backgroundPreferenceValue(GlassEffectParticipantsKey.self) { participants in
             GeometryReader { proxy in
                 GlassEffectFallbackBackground(participants: participants, proxy: proxy)
@@ -245,36 +248,36 @@ private struct GlassEffectFallbackBackground: View {
     }
 }
 
-private struct GlassEffectFallbackMask: View {
-    let participants: [GlassEffectParticipant]
-    let proxy: GeometryProxy
-
-    @State private var overlayVersion = 0
-
-    var body: some View {
-        let resolved = participants.enumerated().map { index, participant in
-            participant.resolve(in: proxy, order: index)
-        }
-
-        var grouped: [GlassEffectGroupingKey: [ResolvedGlassEffectParticipant]] = [:]
-        for participant in resolved {
-            let key = participant.groupingKey
-            grouped[key, default: []].append(participant)
-        }
-
-        let orderedKeys = grouped.keys.sorted(by: { $0.id.hashValue < $1.id.hashValue })
-
-        return ZStack(alignment: .topLeading) {
-            ForEach(orderedKeys) { key in
-                if let members = grouped[key] {
-                    GlassEffectUnionMask(members: members)
-                        .transition(.fallbackBlur)
-                }
-            }
-        }
-        .allowsHitTesting(false)
-    }
-}
+//private struct GlassEffectFallbackMask: View {
+//    let participants: [GlassEffectParticipant]
+//    let proxy: GeometryProxy
+//
+//    @State private var overlayVersion = 0
+//
+//    var body: some View {
+//        let resolved = participants.enumerated().map { index, participant in
+//            participant.resolve(in: proxy, order: index)
+//        }
+//
+//        var grouped: [GlassEffectGroupingKey: [ResolvedGlassEffectParticipant]] = [:]
+//        for participant in resolved {
+//            let key = participant.groupingKey
+//            grouped[key, default: []].append(participant)
+//        }
+//
+//        let orderedKeys = grouped.keys.sorted(by: { $0.id.hashValue < $1.id.hashValue })
+//
+//        return ZStack(alignment: .topLeading) {
+//            ForEach(orderedKeys) { key in
+//                if let members = grouped[key] {
+//                    GlassEffectUnionMask(members: members)
+//                        .transition(.fallbackBlur)
+//                }
+//            }
+//        }
+//        .allowsHitTesting(false)
+//    }
+//}
 
 private struct GlassEffectUnionBackground: View {
     let members: [ResolvedGlassEffectParticipant]
@@ -299,29 +302,29 @@ private struct GlassEffectUnionBackground: View {
         )
     }
 }
-
-private struct GlassEffectUnionMask: View {
-    let members: [ResolvedGlassEffectParticipant]
-
-    var body: some View {
-        guard let anchor = members.min(by: { $0.order < $1.order }) else {
-            return AnyView(EmptyView())
-        }
-
-        let bounds = members.reduce(anchor.frame) { partial, participant in
-            partial.union(participant.frame)
-        }
-
-        let shape = anchor.shape ?? AnyGlassShape(Capsule())
-
-        return AnyView(
-            Color.red
-                .clipShape(shape)
-                .frame(width: bounds.width, height: bounds.height)
-                .position(x: bounds.midX, y: bounds.midY)
-        )
-    }
-}
+//
+//private struct GlassEffectUnionMask: View {
+//    let members: [ResolvedGlassEffectParticipant]
+//
+//    var body: some View {
+//        guard let anchor = members.min(by: { $0.order < $1.order }) else {
+//            return AnyView(EmptyView())
+//        }
+//
+//        let bounds = members.reduce(anchor.frame) { partial, participant in
+//            partial.union(participant.frame)
+//        }
+//
+//        let shape = anchor.shape ?? AnyGlassShape(Capsule())
+//
+//        return AnyView(
+//            Color.red
+//                .clipShape(shape)
+//                .frame(width: bounds.width, height: bounds.height)
+//                .position(x: bounds.midX, y: bounds.midY)
+//        )
+//    }
+//}
 
 private extension CGRect {
     func union(_ other: CGRect) -> CGRect {
