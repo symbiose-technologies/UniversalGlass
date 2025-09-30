@@ -300,8 +300,8 @@ private struct UniversalGlassFallbackBackground: ViewModifier {
     ]
     
     VStack(spacing: 24) {
-        Text("Glass Types")
-            .foregroundStyle(.white)
+//        Text("Glass Types")
+//            .foregroundStyle(.white)
         VStack(spacing: 24) {
             ForEach(Array(glassSamples.enumerated()), id: \.offset) { entry in
                 Label(entry.element.title, systemImage: "sparkles")
@@ -312,9 +312,14 @@ private struct UniversalGlassFallbackBackground: ViewModifier {
             }
         }
         
+        Color.white.frame(height: 1.6)
+            .opacity(0.5)
+            .padding(.vertical)
+            .frame(width: 200)
         
-        Text("Material Types")
-            .foregroundStyle(.white)
+//        Text("Material Types")
+//            .foregroundStyle(.white)
+//            .font(.title2.weight(.bold))
         VStack(spacing: 24) {
             ForEach(Array(materialSamples.enumerated()), id: \.offset) { entry in
                 Label(entry.element.title, systemImage: "sparkles")

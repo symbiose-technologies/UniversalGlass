@@ -135,6 +135,7 @@ private struct FallbackGlassEffectContainerRenderer<Content: View>: View {
     var spacing: CGFloat? = .zero
     let rendering: UniversalGlassRendering
     let content: () -> Content
+//    @State private var participants: [GlassEffectParticipant] = []
 
     var body: some View {
         ZStack(alignment: .topLeading) {
