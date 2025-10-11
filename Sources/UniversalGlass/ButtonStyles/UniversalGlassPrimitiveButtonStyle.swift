@@ -4,47 +4,40 @@ import SwiftUI
 
 public struct UniversalGlassButtonStyle: PrimitiveButtonStyle {
     public typealias Body = AnyView
-    
+
     private let rendering: UniversalGlassRendering
-    
+
     public init(
         rendering: UniversalGlassRendering = .automatic
     ) {
         self.rendering = rendering
     }
-    
+
     public func makeBody(configuration: Configuration) -> AnyView {
         AnyView(resolvedBody(configuration: configuration))
     }
-    
+
     @ViewBuilder
     private func resolvedBody(configuration: Configuration) -> some View {
         if shouldUseGlass {
             if #available(iOS 26.0, macOS 26.0, *) {
                 GlassButtonStyle().makeBody(configuration: configuration)
             } else {
-                fallbackBody(configuration: configuration, variant: .standard)
+                fallbackBody(configuration: configuration)
             }
         } else {
-            fallbackBody(configuration: configuration, variant: .standard)
+            fallbackBody(configuration: configuration)
         }
     }
-    
+
     @ViewBuilder
-    private func fallbackBody(
-        configuration: Configuration,
-        variant: UniversalGlassLegacyVariant
-    ) -> some View {
+    private func fallbackBody(configuration: Configuration) -> some View {
         Button(action: configuration.trigger) {
             configuration.label
         }
-        .buttonStyle(
-            UniversalGlassLegacyMaterialStyle(
-                variant: variant
-            )
-        )
+        .buttonStyle(.bordered)
     }
-    
+
     private var shouldUseGlass: Bool {
         resolveShouldUseGlass(for: rendering)
     }
@@ -52,47 +45,40 @@ public struct UniversalGlassButtonStyle: PrimitiveButtonStyle {
 
 public struct UniversalGlassProminentButtonStyle: PrimitiveButtonStyle {
     public typealias Body = AnyView
-    
+
     private let rendering: UniversalGlassRendering
-    
+
     public init(
         rendering: UniversalGlassRendering = .automatic
     ) {
         self.rendering = rendering
     }
-    
+
     public func makeBody(configuration: Configuration) -> AnyView {
         AnyView(resolvedBody(configuration: configuration))
     }
-    
+
     @ViewBuilder
     private func resolvedBody(configuration: Configuration) -> some View {
         if shouldUseGlass {
             if #available(iOS 26.0, macOS 26.0, *) {
                 GlassProminentButtonStyle().makeBody(configuration: configuration)
             } else {
-                fallbackBody(configuration: configuration, variant: .prominent)
+                fallbackBody(configuration: configuration)
             }
         } else {
-            fallbackBody(configuration: configuration, variant: .prominent)
+            fallbackBody(configuration: configuration)
         }
     }
-    
+
     @ViewBuilder
-    private func fallbackBody(
-        configuration: Configuration,
-        variant: UniversalGlassLegacyVariant
-    ) -> some View {
+    private func fallbackBody(configuration: Configuration) -> some View {
         Button(action: configuration.trigger) {
             configuration.label
         }
-        .buttonStyle(
-            UniversalGlassLegacyMaterialStyle(
-                variant: variant
-            )
-        )
+        .buttonStyle(.borderedProminent)
     }
-    
+
     private var shouldUseGlass: Bool {
         resolveShouldUseGlass(for: rendering)
     }

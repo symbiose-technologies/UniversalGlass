@@ -135,6 +135,8 @@ private struct FallbackGlassEffectContainerRenderer<Content: View>: View {
     var spacing: CGFloat? = .zero
     let rendering: UniversalGlassRendering
     let content: () -> Content
+
+    // NOTE: Dynamic masking approach didn't work as expected. May revisit for future improvements.
 //    @State private var participants: [GlassEffectParticipant] = []
 
     var body: some View {
@@ -143,6 +145,7 @@ private struct FallbackGlassEffectContainerRenderer<Content: View>: View {
                 .environment(\.glassEffectParticipantContext, GlassEffectParticipantContext())
                 .environment(\.isInFallbackGlassContainer, true)
         }
+        // NOTE: Overlay masking approach didn't work as expected. May revisit for future improvements.
 //        .overlayPreferenceValue(GlassEffectParticipantsKey.self) { participants in
 //            GeometryReader { proxy in
 //                GlassEffectFallbackMask(participants: participants, proxy: proxy)
