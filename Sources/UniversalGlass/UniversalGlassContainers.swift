@@ -119,9 +119,9 @@ public extension View {
         } else {
             switch transition {
             case .materialize:
-                self.transition(.blur)
+                self.transition(.universalGlassMaterialBlur)
             case .matchedGeometry:
-                self.transition(.blur)
+                self.transition(.universalGlassMaterialBlur)
             case .identity:
                 self
             }
@@ -243,7 +243,7 @@ private struct GlassEffectFallbackBackground: View {
             ForEach(orderedKeys) { key in
                 if let members = grouped[key] {
                     GlassEffectUnionBackground(members: members)
-                        .transition(.fallbackBlur)
+                        .transition(.universalGlassMaterialFallbackBlur)
                 }
             }
         }
@@ -277,7 +277,7 @@ private struct GlassEffectFallbackMask: View {
                 ForEach(orderedKeys) { key in
                     if let members = grouped[key] {
                         GlassEffectUnionMask(members: members)
-                            .transition(.fallbackBlur)
+                            .transition(.universalGlassMaterialFallbackBlur)
                     }
                 }
             }

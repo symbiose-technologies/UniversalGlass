@@ -240,7 +240,7 @@ private struct UniversalGlassEffectModifier: ViewModifier {
             ? AnyView(content.modifier(UniversalGlassFallbackBackground(material: material, tint: tint, shape: targetShape)))
             : AnyView(content)
         return base
-            .transition(.blur)
+            .transition(.universalGlassMaterialBlur)
             .anchorPreference(key: GlassEffectParticipantsKey.self, value: .bounds) { anchor in
                 [GlassEffectParticipant(
                     id: UUID(),
