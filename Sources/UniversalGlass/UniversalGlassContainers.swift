@@ -170,7 +170,7 @@ private struct ResolvedGlassEffectParticipant: Identifiable {
     let effectID: AnyHashable?
     let transition: UniversalGlassEffectTransition?
     let shape: AnyGlassShape?
-    let glass: UniversalGlass?
+    let glass: UniversalGlassConfiguration?
     let fallbackMaterial: Material
     let fallbackTint: Color?
     let rendering: UniversalGlassRendering

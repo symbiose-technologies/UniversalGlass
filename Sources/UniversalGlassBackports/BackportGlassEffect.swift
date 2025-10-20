@@ -18,12 +18,12 @@ public extension View {
         universalGlassEffect(in: shape)
     }
 
-    func glassEffect(_ glass: UniversalGlass) -> some View {
+    func glassEffect(_ glass: UniversalGlassConfiguration) -> some View {
         universalGlassEffect(glass)
     }
 
     func glassEffect<S: Shape>(
-        _ glass: UniversalGlass,
+        _ glass: UniversalGlassConfiguration,
         in shape: S
     ) -> some View {
         universalGlassEffect(glass, in: shape)

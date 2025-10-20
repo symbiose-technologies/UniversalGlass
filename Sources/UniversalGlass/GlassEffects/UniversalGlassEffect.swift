@@ -54,7 +54,7 @@ struct GlassEffectParticipant: Identifiable {
     var effectID: AnyHashable?
     let transition: UniversalGlassEffectTransition?
     let shape: AnyGlassShape?
-    let glass: UniversalGlass?
+    let glass: UniversalGlassConfiguration?
     let fallbackMaterial: Material
     let fallbackTint: Color?
     let rendering: UniversalGlassRendering
@@ -139,7 +139,7 @@ public extension View {
     /// - Parameter rendering: Controls whether glass or material rendering is enforced.
     @ViewBuilder
     func universalGlassEffect(
-        _ glass: UniversalGlass,
+        _ glass: UniversalGlassConfiguration,
         rendering: UniversalGlassRendering = .automatic
     ) -> some View {
         if #available(iOS 26.0, macOS 26.0, *) {
@@ -172,7 +172,7 @@ public extension View {
     /// Applies a glass effect with custom glass configuration and shape with backward compatibility.
     @ViewBuilder
     func universalGlassEffect<S: Shape>(
-        _ glass: UniversalGlass,
+        _ glass: UniversalGlassConfiguration,
         in shape: S,
         rendering: UniversalGlassRendering = .automatic
     ) -> some View {
@@ -207,7 +207,7 @@ public extension View {
 private extension View {
     func applyingUniversalGlassFallback(
         fallbackMaterial: Material,
-        glassConfiguration: UniversalGlass?,
+        glassConfiguration: UniversalGlassConfiguration?,
         shape: AnyGlassShape?,
         rendering: UniversalGlassRendering
     ) -> some View {
@@ -227,7 +227,7 @@ private struct UniversalGlassEffectModifier: ViewModifier {
     @Environment(\.isInFallbackGlassContainer) private var isInContainer
 
     let fallbackMaterial: Material
-    let glassConfiguration: UniversalGlass?
+    let glassConfiguration: UniversalGlassConfiguration?
     let shape: AnyGlassShape?
     let rendering: UniversalGlassRendering
 
@@ -286,12 +286,12 @@ private struct UniversalGlassFallbackBackground: ViewModifier {
 
 #if DEBUG
 #Preview("UniversalGlass presets") {
-    let glassSamples: [(title: String, configuration: UniversalGlass)] = [
+    let glassSamples: [(title: String, configuration: UniversalGlassConfiguration)] = [
         ("Clear", .clear.interactive()),
         ("Clear + Cyan Tint", .clear.tint(.cyan).interactive()),
         ("Regular", .regular.interactive())
     ]
-    let materialSamples: [(title: String, configuration: UniversalGlass)] = [
+    let materialSamples: [(title: String, configuration: UniversalGlassConfiguration)] = [
         ("Ultra Thin", .ultraThin.interactive()),
         ("Thin", .thin.interactive()),
         ("Regular", .regular.interactive()),
