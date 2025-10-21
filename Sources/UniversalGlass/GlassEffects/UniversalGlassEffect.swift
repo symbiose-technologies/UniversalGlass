@@ -55,7 +55,7 @@ struct GlassEffectParticipant: Identifiable {
     let transition: UniversalGlassEffectTransition?
     let shape: AnyGlassShape?
     let glass: UniversalGlassConfiguration?
-    let fallbackMaterial: Material
+    let fallbackMaterial: Material?
     let fallbackTint: Color?
     let rendering: UniversalGlassRendering
     let drawsOwnBackground: Bool
@@ -206,7 +206,7 @@ public extension View {
 
 private extension View {
     func applyingUniversalGlassFallback(
-        fallbackMaterial: Material,
+        fallbackMaterial: Material?,
         glassConfiguration: UniversalGlassConfiguration?,
         shape: AnyGlassShape?,
         rendering: UniversalGlassRendering
@@ -226,7 +226,7 @@ private struct UniversalGlassEffectModifier: ViewModifier {
     @Environment(\.glassEffectParticipantContext) private var context
     @Environment(\.isInFallbackGlassContainer) private var isInContainer
 
-    let fallbackMaterial: Material
+    let fallbackMaterial: Material?
     let glassConfiguration: UniversalGlassConfiguration?
     let shape: AnyGlassShape?
     let rendering: UniversalGlassRendering
@@ -236,9 +236,14 @@ private struct UniversalGlassEffectModifier: ViewModifier {
         let material = glassConfiguration?.fallbackMaterial ?? fallbackMaterial
         let tint = glassConfiguration?.fallbackTint
         let targetShape = shape ?? AnyGlassShape(Capsule())
-        let base = drawsBackground
-            ? AnyView(content.modifier(UniversalGlassFallbackBackground(material: material, tint: tint, shape: targetShape)))
-            : AnyView(content)
+        let base: AnyView
+        if let material = material {
+            base = drawsBackground
+                ? AnyView(content.modifier(UniversalGlassFallbackBackground(material: material, tint: tint, shape: targetShape)))
+                : AnyView(content)
+        } else {
+            base = AnyView(content)
+        }
         return base
             .transition(.universalGlassMaterialBlur)
             .anchorPreference(key: GlassEffectParticipantsKey.self, value: .bounds) { anchor in
@@ -287,6 +292,7 @@ private struct UniversalGlassFallbackBackground: ViewModifier {
 #if DEBUG
 #Preview("UniversalGlass presets") {
     let glassSamples: [(title: String, configuration: UniversalGlassConfiguration)] = [
+        ("Identity", .identity.interactive()),
         ("Clear", .clear.interactive()),
         ("Clear + Cyan Tint", .clear.tint(.cyan).interactive()),
         ("Regular", .regular.interactive())

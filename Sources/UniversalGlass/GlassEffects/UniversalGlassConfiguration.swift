@@ -26,17 +26,17 @@ import AppKit
 
 /// A configuration type that provides liquid glass effects on iOS 26+ and material fallbacks on older versions.
 public struct UniversalGlassConfiguration {
-    let fallbackMaterial: Material
+    let fallbackMaterial: Material?
     let fallbackTint: Color?
     private let _liquidGlass: Any?
-    
+
     @available(iOS 26.0, macOS 26.0, *)
     public var liquidGlass: Glass? {
         _liquidGlass as? Glass
     }
-    
+
     private init(
-        fallbackMaterial: Material,
+        fallbackMaterial: Material?,
         fallbackTint: Color? = nil,
         liquidGlass: Any? = nil
     ) {
@@ -69,10 +69,9 @@ public struct UniversalGlassConfiguration {
                 liquidGlass: tintedGlass
             )
         }
-        let tint = systemBackgroundTint(opacity: 0.4)
         return UniversalGlassConfiguration(
             fallbackMaterial: .thickMaterial,
-            fallbackTint: tint
+            fallbackTint: nil
         )
     }()
     
@@ -87,17 +86,16 @@ public struct UniversalGlassConfiguration {
                 liquidGlass: tintedGlass
             )
         }
-        let tint = systemBackgroundTint(opacity: 0.7)
         return UniversalGlassConfiguration(
             fallbackMaterial: .ultraThickMaterial,
-            fallbackTint: tint
+            fallbackTint: nil
         )
     }()
     
     /// Thin liquid glass effect with thin material fallback and a faint background tint.
     nonisolated(unsafe) public static let thin: UniversalGlassConfiguration = {
         if #available(iOS 26.0, macOS 26.0, *) {
-            let tint = systemBackgroundTint(opacity: 0.18)
+            let tint = systemBackgroundTint(opacity: 0.4)
             let tintedGlass: Any = Glass.clear.tint(tint)
             return UniversalGlassConfiguration(
                 fallbackMaterial: .thinMaterial,
@@ -105,10 +103,9 @@ public struct UniversalGlassConfiguration {
                 liquidGlass: tintedGlass
             )
         }
-        let tint = systemBackgroundTint(opacity: 0.18)
         return UniversalGlassConfiguration(
             fallbackMaterial: .thinMaterial,
-            fallbackTint: tint
+            fallbackTint: nil
         )
     }()
     
@@ -137,7 +134,20 @@ public struct UniversalGlassConfiguration {
             return UniversalGlassConfiguration(fallbackMaterial: .ultraThinMaterial)
         }
     }()
-    
+
+    /// Identity configuration with no glass effect or material.
+    nonisolated(unsafe) public static let identity: UniversalGlassConfiguration = {
+        if #available(iOS 26.0, macOS 26.0, *) {
+            return UniversalGlassConfiguration(
+                fallbackMaterial: nil,
+                fallbackTint: nil,
+                liquidGlass: Glass.identity
+            )
+        } else {
+            return UniversalGlassConfiguration(fallbackMaterial: nil)
+        }
+    }()
+
     /// Creates a tinted liquid glass effect with the specified color.
     /// Falls back to regular material on older versions.
     public func tint(_ color: Color) -> UniversalGlassConfiguration {

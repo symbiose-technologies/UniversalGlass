@@ -171,7 +171,7 @@ private struct ResolvedGlassEffectParticipant: Identifiable {
     let transition: UniversalGlassEffectTransition?
     let shape: AnyGlassShape?
     let glass: UniversalGlassConfiguration?
-    let fallbackMaterial: Material
+    let fallbackMaterial: Material?
     let fallbackTint: Color?
     let rendering: UniversalGlassRendering
     let drawsOwnBackground: Bool
@@ -303,22 +303,26 @@ private struct GlassEffectUnionBackground: View {
         let material = anchor.glass?.fallbackMaterial ?? anchor.fallbackMaterial
         let tint = anchor.glass?.fallbackTint ?? anchor.fallbackTint
 
-        return AnyView(
-            ZStack {
-                if let tint {
-                    shape.fill(tint)
+        if let material = material {
+            return AnyView(
+                ZStack {
+                    if let tint {
+                        shape.fill(tint)
+                    }
+                    if #available(iOS 15.0, macOS 13.0, *) {
+                        shape
+                            .fill(material)
+                            .shadow(color: Color.black.opacity(0.04), radius: 8)
+                    } else {
+                        shape.fill(material)
+                    }
                 }
-                if #available(iOS 15.0, macOS 13.0, *) {
-                    shape
-                        .fill(material)
-                        .shadow(color: Color.black.opacity(0.04), radius: 8)
-                } else {
-                    shape.fill(material)
-                }
-            }
-            .frame(width: bounds.width, height: bounds.height)
-            .position(x: bounds.midX, y: bounds.midY)
-        )
+                .frame(width: bounds.width, height: bounds.height)
+                .position(x: bounds.midX, y: bounds.midY)
+            )
+        } else {
+            return AnyView(EmptyView())
+        }
     }
 }
 
