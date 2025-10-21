@@ -241,6 +241,7 @@ private struct GlassEffectFallbackBackground: View {
                 if let members = grouped[key] {
                     GlassEffectUnionBackground(members: members)
                         .transition(.universalGlassMaterialFallbackBlur)
+                        .id(key.id)
                 }
             }
         }
