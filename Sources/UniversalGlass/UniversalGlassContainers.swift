@@ -151,9 +151,6 @@ private struct FallbackGlassEffectContainerRenderer<Content: View>: View {
 //                GlassEffectFallbackMask(participants: participants, proxy: proxy)
 //            }
 //        }
-        .mask({
-            Capsule()
-        })
         .backgroundPreferenceValue(GlassEffectParticipantsKey.self) { participants in
             GeometryReader { proxy in
                 GlassEffectFallbackBackground(participants: participants, proxy: proxy)
