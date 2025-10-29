@@ -8,7 +8,7 @@ import UIKit
 private extension UniversalGlassConfiguration {
     static func systemBackgroundTint(opacity: Double) -> Color {
         let base: Color
-#if canImport(UIKit)
+#if canImport(UIKit) && !os(watchOS)
         base = Color(UIColor.systemBackground)
 #elseif canImport(AppKit) && !targetEnvironment(macCatalyst)
         base = Color(NSColor.windowBackgroundColor)

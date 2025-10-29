@@ -8,7 +8,8 @@
 </div>
 
 <p align="center">
-  <a href="https://developer.apple.com/ios/"><img src="https://badgen.net/badge/iOS/17+/purple" alt="iOS 17+"></a>
+  <a href="https://developer.apple.com/ios/"><img src="https://badgen.net/badge/iOS/17+/blue" alt="iOS 17+"></a>
+  <a href="https://developer.apple.com/visionOS/"><img src="https://badgen.net/badge/visionOS/1+/blue" alt="visionOS 1+"></a>
   <a href="https://www.apple.com/macos/"><img src="https://badgen.net/badge/macOS/13+/blue" alt="macOS 13+"></a>
   <a href="https://developer.apple.com/tvos/"><img src="https://badgen.net/badge/tvOS/17+/blue" alt="tvOS 17+"></a>
   <a href="https://developer.apple.com/watchos/"><img src="https://badgen.net/badge/watchOS/10+/blue" alt="watchOS 10+"></a>

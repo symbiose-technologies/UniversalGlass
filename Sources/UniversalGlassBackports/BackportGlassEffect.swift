@@ -8,7 +8,8 @@ import UniversalGlass
 @available(macOS, introduced: 11.0, obsoleted: 26.0)
 @available(macCatalyst, introduced: 13.0, obsoleted: 26.0)
 @available(tvOS, introduced: 18.0, obsoleted: 26.0)
-@available(watchOS, introduced: 11.0, obsoleted: 26.0)
+@available(watchOS, introduced: 10.0, obsoleted: 26.0)
+@available(visionOS, unavailable, message: "Use universalGlassEffect instead - Glass APIs are not available on visionOS")
 public extension View {
     func glassEffect() -> some View {
         universalGlassEffect()
@@ -31,6 +32,7 @@ public extension View {
 }
 
 #if DEBUG
+@available(iOS 17.0, macOS 14.0, tvOS 18.0, watchOS 10.0, *)
 #Preview("Backport Glass Effect") {
     VStack(spacing: 32) {
         Text("Standard Glass")
