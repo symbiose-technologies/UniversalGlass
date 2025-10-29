@@ -7,6 +7,7 @@ let package = Package(
     name: "UniversalGlass",
     platforms: [
         .iOS(.v17),
+        .visionOS(.v1),
         .macOS(.v13),
         .watchOS(.v10),
         .tvOS(.v17)

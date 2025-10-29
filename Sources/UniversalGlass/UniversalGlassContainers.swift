@@ -9,7 +9,8 @@ public func UniversalGlassEffectContainer<Content: View>(
     rendering: UniversalGlassRendering = .automatic,
     @ViewBuilder content: @escaping () -> Content
 ) -> some View {
-    if #available(iOS 26.0, macOS 26.0, *) {
+    #if !os(visionOS)
+    if #available(iOS 26.0, macOS 26.0, tvOS 26.0, watchOS 26.0, *) {
         switch rendering {
         case .material:
             FallbackGlassEffectContainerRenderer(
@@ -27,6 +28,14 @@ public func UniversalGlassEffectContainer<Content: View>(
             content: content
         )
     }
+    #else
+    // visionOS doesn't have GlassEffectContainer, always use fallback
+    FallbackGlassEffectContainerRenderer(
+        spacing: spacing,
+        rendering: rendering,
+        content: content
+    )
+    #endif
 }
 
 // MARK: - Glass Effect Morphing Helpers
@@ -40,7 +49,8 @@ public extension View {
         namespace: Namespace.ID,
         rendering: UniversalGlassRendering = .automatic
     ) -> some View {
-        if #available(iOS 26.0, macOS 26.0, *) {
+        #if !os(visionOS)
+        if #available(iOS 26.0, macOS 26.0, tvOS 26.0, watchOS 26.0, *) {
             switch rendering {
             case .material:
                 self
@@ -58,6 +68,13 @@ public extension View {
                     context.union = GlassEffectUnion(id: AnyHashable(id), namespace: namespace)
                 }
         }
+        #else
+        // visionOS doesn't have glassEffectUnion, always use fallback context
+        self
+            .transformEnvironment(\.glassEffectParticipantContext) { context in
+                context.union = GlassEffectUnion(id: AnyHashable(id), namespace: namespace)
+            }
+        #endif
     }
     
     /// Applies a glass effect ID for morphing transitions with backward compatibility
@@ -67,7 +84,8 @@ public extension View {
         in namespace: Namespace.ID,
         rendering: UniversalGlassRendering = .automatic
     ) -> some View {
-        if #available(iOS 26.0, macOS 26.0, *) {
+        #if !os(visionOS)
+        if #available(iOS 26.0, macOS 26.0, tvOS 26.0, watchOS 26.0, *) {
             switch rendering {
             case .material:
                 self.transformEnvironment(\.glassEffectParticipantContext) { context in
@@ -85,6 +103,13 @@ public extension View {
                 context.union = GlassEffectUnion(id: AnyHashable(id), namespace: namespace)
             }
         }
+        #else
+        // visionOS doesn't have glassEffectID, always use fallback context
+        self.transformEnvironment(\.glassEffectParticipantContext) { context in
+            context.effectID = AnyHashable(id)
+            context.union = GlassEffectUnion(id: AnyHashable(id), namespace: namespace)
+        }
+        #endif
     }
 }
 
@@ -103,12 +128,13 @@ public extension View {
     func universalGlassEffectTransition(
         _ transition: UniversalGlassEffectTransition
     ) -> some View {
-        if #available(iOS 26.0, macOS 26.0, *) {
+        #if !os(visionOS)
+        if #available(iOS 26.0, macOS 26.0, tvOS 26.0, watchOS 26.0, *) {
             switch transition {
             case .materialize:
                 self.glassEffectTransition(.materialize)
             case .matchedGeometry:
-                if #available(iOS 26.1, macOS 26.1, *) {
+                if #available(iOS 26.1, macOS 26.1, tvOS 26.1, watchOS 26.1, *) {
                     self.glassEffectTransition(.matchedGeometry)
                 } else {
                     self
@@ -126,6 +152,17 @@ public extension View {
                 self
             }
         }
+        #else
+        // visionOS doesn't have glassEffectTransition, always use material transitions
+        switch transition {
+        case .materialize:
+            self.transition(.universalGlassMaterialBlur)
+        case .matchedGeometry:
+            self.transition(.universalGlassMaterialBlur)
+        case .identity:
+            self
+        }
+        #endif
     }
 }
 
@@ -300,6 +337,7 @@ private struct GlassEffectUnionBackground: View {
         let shape = anchor.shape ?? AnyGlassShape(Capsule())
         let material = anchor.glass?.fallbackMaterial ?? anchor.fallbackMaterial
         let tint = anchor.glass?.fallbackTint ?? anchor.fallbackTint
+        let shadow = anchor.glass?.fallbackShadow ?? .default
 
         if let material = material {
             return AnyView(
@@ -310,7 +348,7 @@ private struct GlassEffectUnionBackground: View {
                     if #available(iOS 15.0, macOS 13.0, *) {
                         shape
                             .fill(material)
-                            .shadow(color: Color.black.opacity(0.04), radius: 8)
+                            .shadow(color: shadow.color, radius: shadow.radius)
                     } else {
                         shape.fill(material)
                     }

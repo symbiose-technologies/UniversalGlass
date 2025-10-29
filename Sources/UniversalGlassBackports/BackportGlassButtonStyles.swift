@@ -8,7 +8,8 @@ import UniversalGlass
 @available(macOS, introduced: 11.0, obsoleted: 26.0)
 @available(macCatalyst, introduced: 13.0, obsoleted: 26.0)
 @available(tvOS, introduced: 18.0, obsoleted: 26.0)
-@available(watchOS, introduced: 11.0, obsoleted: 26.0)
+@available(watchOS, introduced: 10.0, obsoleted: 26.0)
+@available(visionOS, unavailable, message: "Use UniversalGlassButtonStyle directly - Glass button styles are not available on visionOS")
 public extension PrimitiveButtonStyle where Self == UniversalGlassButtonStyle {
     static var glass: UniversalGlassButtonStyle {
         UniversalGlassButtonStyle()
@@ -19,7 +20,8 @@ public extension PrimitiveButtonStyle where Self == UniversalGlassButtonStyle {
 @available(macOS, introduced: 11.0, obsoleted: 26.0)
 @available(macCatalyst, introduced: 13.0, obsoleted: 26.0)
 @available(tvOS, introduced: 18.0, obsoleted: 26.0)
-@available(watchOS, introduced: 11.0, obsoleted: 26.0)
+@available(watchOS, introduced: 10.0, obsoleted: 26.0)
+@available(visionOS, unavailable, message: "Use UniversalGlassProminentButtonStyle directly - Glass button styles are not available on visionOS")
 public extension PrimitiveButtonStyle where Self == UniversalGlassProminentButtonStyle {
     static var glassProminent: UniversalGlassProminentButtonStyle {
         UniversalGlassProminentButtonStyle()

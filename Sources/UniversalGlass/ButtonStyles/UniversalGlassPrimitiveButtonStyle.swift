@@ -20,11 +20,15 @@ public struct UniversalGlassButtonStyle: PrimitiveButtonStyle {
     @ViewBuilder
     private func resolvedBody(configuration: Configuration) -> some View {
         if shouldUseGlass {
-            if #available(iOS 26.0, macOS 26.0, *) {
+            #if !os(visionOS)
+            if #available(iOS 26.0, macOS 26.0, tvOS 26.0, watchOS 26.0, *) {
                 GlassButtonStyle().makeBody(configuration: configuration)
             } else {
                 fallbackBody(configuration: configuration)
             }
+            #else
+            fallbackBody(configuration: configuration)
+            #endif
         } else {
             fallbackBody(configuration: configuration)
         }
@@ -61,11 +65,15 @@ public struct UniversalGlassProminentButtonStyle: PrimitiveButtonStyle {
     @ViewBuilder
     private func resolvedBody(configuration: Configuration) -> some View {
         if shouldUseGlass {
-            if #available(iOS 26.0, macOS 26.0, *) {
+            #if !os(visionOS)
+            if #available(iOS 26.0, macOS 26.0, tvOS 26.0, watchOS 26.0, *) {
                 GlassProminentButtonStyle().makeBody(configuration: configuration)
             } else {
                 fallbackBody(configuration: configuration)
             }
+            #else
+            fallbackBody(configuration: configuration)
+            #endif
         } else {
             fallbackBody(configuration: configuration)
         }

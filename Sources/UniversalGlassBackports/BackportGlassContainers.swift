@@ -7,7 +7,8 @@ import UniversalGlass
 @available(macOS, introduced: 11.0, obsoleted: 26.0)
 @available(macCatalyst, introduced: 13.0, obsoleted: 26.0)
 @available(tvOS, introduced: 18.0, obsoleted: 26.0)
-@available(watchOS, introduced: 11.0, obsoleted: 26.0)
+@available(watchOS, introduced: 10.0, obsoleted: 26.0)
+@available(visionOS, unavailable, message: "Use UniversalGlassEffectContainer instead - GlassEffectContainer is not available on visionOS")
 @MainActor @ViewBuilder
 public func GlassEffectContainer<Content: View>(
     spacing: CGFloat? = nil,
@@ -20,7 +21,8 @@ public func GlassEffectContainer<Content: View>(
 @available(macOS, introduced: 11.0, obsoleted: 26.0)
 @available(macCatalyst, introduced: 13.0, obsoleted: 26.0)
 @available(tvOS, introduced: 18.0, obsoleted: 26.0)
-@available(watchOS, introduced: 11.0, obsoleted: 26.0)
+@available(watchOS, introduced: 10.0, obsoleted: 26.0)
+@available(visionOS, unavailable, message: "Use universalGlassEffectUnion and universalGlassEffectID instead - Glass effect morphing APIs are not available on visionOS")
 public extension View {
     @ViewBuilder
     func glassEffectUnion<ID: Hashable & Sendable>(
@@ -45,7 +47,8 @@ public extension View {
 @available(macOS, introduced: 11.0, obsoleted: 26.0)
 @available(macCatalyst, introduced: 13.0, obsoleted: 26.0)
 @available(tvOS, introduced: 18.0, obsoleted: 26.0)
-@available(watchOS, introduced: 11.0, obsoleted: 26.0)
+@available(watchOS, introduced: 10.0, obsoleted: 26.0)
+@available(visionOS, unavailable)
 public enum GlassEffectTransitionBackport: Sendable {
     case materialize
     case matchedGeometry
@@ -64,14 +67,16 @@ public enum GlassEffectTransitionBackport: Sendable {
 @available(macOS, introduced: 11.0, obsoleted: 26.0)
 @available(macCatalyst, introduced: 13.0, obsoleted: 26.0)
 @available(tvOS, introduced: 18.0, obsoleted: 26.0)
-@available(watchOS, introduced: 11.0, obsoleted: 26.0)
+@available(watchOS, introduced: 10.0, obsoleted: 26.0)
+@available(visionOS, unavailable)
 public typealias GlassEffectTransition = GlassEffectTransitionBackport
 
 @available(iOS, introduced: 13.0, obsoleted: 26.0)
 @available(macOS, introduced: 11.0, obsoleted: 26.0)
 @available(macCatalyst, introduced: 13.0, obsoleted: 26.0)
 @available(tvOS, introduced: 18.0, obsoleted: 26.0)
-@available(watchOS, introduced: 11.0, obsoleted: 26.0)
+@available(watchOS, introduced: 10.0, obsoleted: 26.0)
+@available(visionOS, unavailable, message: "Use universalGlassEffectTransition instead - Glass effect transitions are not available on visionOS")
 public extension View {
     @ViewBuilder
     func glassEffectTransition(
