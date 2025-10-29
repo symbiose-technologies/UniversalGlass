@@ -187,7 +187,8 @@ private struct _UniversalGlassEffectView<Content: View>: View {
     var body: some View {
         let effectiveRendering = environmentRendering ?? rendering
 
-        if #available(iOS 26.0, macOS 26.0, *) {
+        #if !os(visionOS)
+        if #available(iOS 26.0, macOS 26.0, tvOS 26.0, watchOS 26.0, *) {
             switch effectiveRendering {
             case .material:
                 content.modifier(
@@ -223,6 +224,17 @@ private struct _UniversalGlassEffectView<Content: View>: View {
                 )
             )
         }
+        #else
+        // visionOS doesn't have Glass APIs, always use Material fallback
+        content.modifier(
+            UniversalGlassEffectModifier(
+                fallbackMaterial: fallbackMaterial,
+                glassConfiguration: glassConfiguration,
+                shape: shape,
+                rendering: effectiveRendering
+            )
+        )
+        #endif
     }
 }
 
