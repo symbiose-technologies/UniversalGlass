@@ -300,6 +300,7 @@ private struct GlassEffectUnionBackground: View {
         let shape = anchor.shape ?? AnyGlassShape(Capsule())
         let material = anchor.glass?.fallbackMaterial ?? anchor.fallbackMaterial
         let tint = anchor.glass?.fallbackTint ?? anchor.fallbackTint
+        let shadow = anchor.glass?.fallbackShadow ?? .default
 
         if let material = material {
             return AnyView(
@@ -310,7 +311,7 @@ private struct GlassEffectUnionBackground: View {
                     if #available(iOS 15.0, macOS 13.0, *) {
                         shape
                             .fill(material)
-                            .shadow(color: Color.black.opacity(0.04), radius: 8)
+                            .shadow(color: shadow.color, radius: shadow.radius)
                     } else {
                         shape.fill(material)
                     }

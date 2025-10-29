@@ -22,12 +22,42 @@ private extension UniversalGlassConfiguration {
 import AppKit
 #endif
 
+// MARK: - Universal Glass Shadow
+
+/// Defines shadow properties for glass effect fallbacks.
+public struct UniversalGlassShadow: Equatable {
+    public let color: Color
+    public let radius: CGFloat
+
+    /// Creates a custom shadow configuration.
+    /// - Parameters:
+    ///   - color: The shadow color.
+    ///   - radius: The shadow blur radius.
+    public init(color: Color, radius: CGFloat) {
+        self.color = color
+        self.radius = radius
+    }
+
+    /// Default shadow with subtle black blur.
+    nonisolated(unsafe) public static let `default` = UniversalGlassShadow(
+        color: .black.opacity(0.04),
+        radius: 8
+    )
+
+    /// No shadow.
+    nonisolated(unsafe) public static let none = UniversalGlassShadow(
+        color: .clear,
+        radius: 0
+    )
+}
+
 // MARK: - Universal Glass Configuration
 
 /// A configuration type that provides liquid glass effects on iOS 26+ and material fallbacks on older versions.
 public struct UniversalGlassConfiguration {
     let fallbackMaterial: Material?
     let fallbackTint: Color?
+    let fallbackShadow: UniversalGlassShadow
     private let _liquidGlass: Any?
 
     @available(iOS 26.0, macOS 26.0, *)
@@ -38,10 +68,12 @@ public struct UniversalGlassConfiguration {
     private init(
         fallbackMaterial: Material?,
         fallbackTint: Color? = nil,
+        fallbackShadow: UniversalGlassShadow = .default,
         liquidGlass: Any? = nil
     ) {
         self.fallbackMaterial = fallbackMaterial
         self.fallbackTint = fallbackTint
+        self.fallbackShadow = fallbackShadow
         self._liquidGlass = liquidGlass
     }
     
@@ -157,6 +189,7 @@ public struct UniversalGlassConfiguration {
                 return UniversalGlassConfiguration(
                     fallbackMaterial: fallbackMaterial,
                     fallbackTint: color,
+                    fallbackShadow: fallbackShadow,
                     liquidGlass: tintedGlass
                 )
             } else {
@@ -164,17 +197,19 @@ public struct UniversalGlassConfiguration {
                 return UniversalGlassConfiguration(
                     fallbackMaterial: fallbackMaterial,
                     fallbackTint: color,
+                    fallbackShadow: fallbackShadow,
                     liquidGlass: tintedGlass
                 )
             }
         } else {
             return UniversalGlassConfiguration(
                 fallbackMaterial: fallbackMaterial,
-                fallbackTint: color
+                fallbackTint: color,
+                fallbackShadow: fallbackShadow
             )
         }
     }
-    
+
     /// Creates an interactive liquid glass effect.
     /// Falls back to the same material on older versions.
     public func interactive(_ isInteractive: Bool = true) -> UniversalGlassConfiguration {
@@ -184,6 +219,7 @@ public struct UniversalGlassConfiguration {
                 return UniversalGlassConfiguration(
                     fallbackMaterial: fallbackMaterial,
                     fallbackTint: fallbackTint,
+                    fallbackShadow: fallbackShadow,
                     liquidGlass: interactiveGlass
                 )
             } else {
@@ -191,15 +227,43 @@ public struct UniversalGlassConfiguration {
                 return UniversalGlassConfiguration(
                     fallbackMaterial: fallbackMaterial,
                     fallbackTint: fallbackTint,
+                    fallbackShadow: fallbackShadow,
                     liquidGlass: interactiveGlass
                 )
             }
         } else {
             return UniversalGlassConfiguration(
                 fallbackMaterial: fallbackMaterial,
-                fallbackTint: fallbackTint
+                fallbackTint: fallbackTint,
+                fallbackShadow: fallbackShadow
             )
         }
+    }
+
+    /// Customizes the fallback material and tint used on older OS versions.
+    /// - Parameters:
+    ///   - material: The Material to use when liquid glass is unavailable. Pass `nil` to remove material fallback.
+    ///   - tint: Optional color tint to apply to the fallback. Pass `nil` to remove tint.
+    /// - Returns: A new configuration with the specified fallback settings.
+    public func fallback(material: Material?, tint: Color? = nil) -> UniversalGlassConfiguration {
+        return UniversalGlassConfiguration(
+            fallbackMaterial: material,
+            fallbackTint: tint,
+            fallbackShadow: fallbackShadow,
+            liquidGlass: _liquidGlass
+        )
+    }
+
+    /// Customizes the shadow applied to the fallback material on older OS versions.
+    /// - Parameter shadow: The shadow configuration to use for the fallback.
+    /// - Returns: A new configuration with the specified shadow settings.
+    public func shadow(_ shadow: UniversalGlassShadow) -> UniversalGlassConfiguration {
+        return UniversalGlassConfiguration(
+            fallbackMaterial: fallbackMaterial,
+            fallbackTint: fallbackTint,
+            fallbackShadow: shadow,
+            liquidGlass: _liquidGlass
+        )
     }
 }
 
